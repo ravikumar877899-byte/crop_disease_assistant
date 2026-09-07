@@ -1,0 +1,110 @@
+<resources>
+    <string name="app_name">AI Crop Care 🌱</string>
+    <string name="tagline">Smart Agricultural AI &amp; Leaf Disease Assistant</string>
+    
+    <!-- Auth -->
+    <string name="login_title">Welcome Back, Farmer</string>
+    <string name="login_subtitle">Sign in to diagnose crop diseases and manage your farm health</string>
+    <string name="email_or_username">Email Address</string>
+    <string name="password">Password</string>
+    <string name="login_button">Sign In</string>
+    <string name="no_account">Don\'t have an account?</string>
+    <string name="register_here">Create Account</string>
+    <string name="register_title">Join AI Crop Care</string>
+    <string name="register_subtitle">Empowering farmers with smart AI diagnostics</string>
+    <string name="full_name">Full Name</string>
+    <string name="farm_location">State / Region</string>
+    <string name="register_button">Register Farm</string>
+    <string name="already_have_account">Already registered?</string>
+    <string name="login_here">Sign In</string>
+    <string name="logout">Sign Out</string>
+    <string name="server_settings">Server Settings</string>
+    <string name="server_url">Backend Server URL</string>
+    <string name="save_server">Save &amp; Connect</string>
+
+    <!-- Home Dashboard -->
+    <string name="home_title">AI Crop Care</string>
+    <string name="greeting_farmer">Hello, %1$s 🌱</string>
+    <string name="weather_card_title">Farm Weather Advisory</string>
+    <string name="weather_temp">Temperature</string>
+    <string name="weather_humidity">Humidity</string>
+    <string name="weather_condition">Conditions</string>
+    <string name="quick_actions">Diagnostic Tools</string>
+    
+    <string name="action_scan">Scan Crop</string>
+    <string name="action_scan_desc">Instant leaf diagnosis with camera</string>
+    
+    <string name="action_upload">Upload Image</string>
+    <string name="action_upload_desc">Select leaf photo from gallery</string>
+    
+    <string name="action_history">Disease History</string>
+    <string name="action_history_desc">Review past scans &amp; treatments</string>
+    
+    <string name="action_chatbot">Krishi AI Chatbot</string>
+    <string name="action_chatbot_desc">24/7 agricultural advisor assistant</string>
+    
+    <string name="language_toggle">Language / மொழி</string>
+    <string name="language_en">English</string>
+    <string name="language_ta">தமிழ்</string>
+
+    <!-- Camera / Scan Screen -->
+    <string name="scan_title">Live Leaf Scanner</string>
+    <string name="scan_instruction">Position the affected leaf clearly inside the green frame</string>
+    <string name="capture_button">Capture Leaf</string>
+    <string name="retake_button">Retake Photo</string>
+    <string name="analyze_button">Analyze with AI</string>
+    <string name="camera_permission_needed">Camera permission is required to scan crop leaves</string>
+    <string name="grant_permission">Grant Permission</string>
+
+    <!-- Upload Screen -->
+    <string name="upload_title">Upload Leaf Image</string>
+    <string name="upload_instruction">Choose a high-resolution photo of the crop leaf from your device</string>
+    <string name="select_gallery">Choose from Gallery</string>
+    <string name="analyzing_title">AI Diagnosis in Progress…</string>
+    <string name="analyzing_desc">Analyzing leaf pathology with MobileNetV2 AI model</string>
+
+    <!-- Analysis Result Screen -->
+    <string name="result_title">AI Diagnosis Report</string>
+    <string name="crop_label">Crop</string>
+    <string name="disease_label">Detected Condition</string>
+    <string name="scientific_name">Scientific Name</string>
+    <string name="status_healthy">Healthy Crop</string>
+    <string name="status_diseased">Disease Detected</string>
+    <string name="confidence_score">AI Confidence</string>
+    <string name="affected_severity">Estimated Severity</string>
+    <string name="visual_observations">Pathology Symptoms &amp; Observations</string>
+    <string name="view_treatment">View Full Treatment Plan</string>
+    <string name="scan_another">Scan Another Leaf</string>
+
+    <!-- Treatment Screen -->
+    <string name="treatment_title">Treatment Recommendations</string>
+    <string name="treatment_management">Prescribed Action Steps</string>
+    <string name="organic_remedies">Organic &amp; Natural Solutions</string>
+    <string name="chemical_remedies">Chemical Management</string>
+    <string name="prevention_tips">Preventive Farming Practices</string>
+    <string name="share_report">Share Prescription</string>
+
+    <!-- History Screen -->
+    <string name="history_title">Diagnosis History</string>
+    <string name="no_history">No previous leaf diagnoses found</string>
+    <string name="scanned_on">Scanned: %1$s</string>
+    <string name="delete_scan">Delete Record</string>
+    <string name="delete_confirm">Are you sure you want to delete this scan from your history?</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+
+    <!-- Chatbot Screen -->
+    <string name="chatbot_title">Krishi AI Consultant</string>
+    <string name="chatbot_subtitle">Ask questions regarding crop care, fertilizers &amp; pests</string>
+    <string name="chat_placeholder">Type your farming question here…</string>
+    <string name="chat_send">Send</string>
+    <string name="chip_pest">How to prevent leaf caterpillars?</string>
+    <string name="chip_fertilizer">Organic NPK dosage for tomato</string>
+    <string name="chip_fungus">Natural fungicide recipes (Neem &amp; Buttermilk)</string>
+
+    <!-- General Feedback -->
+    <string name="loading">Please wait…</string>
+    <string name="error_network">Unable to reach the AI server. Please verify your connection.</string>
+    <string name="error_generic">An error occurred. Please try again.</string>
+    <string name="success">Operation completed successfully.</string>
+</resources>

@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">AI Crop Care</string>
+    <string name="app_tagline">Smart Farming. Better Crops.</string>
+    <string name="header_greeting">Hello, Farmer 👋</string>
+    <string name="header_subtitle">Let\'s take care of your crops today.</string>
+</resources>

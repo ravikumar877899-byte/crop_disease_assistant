@@ -1,0 +1,142 @@
+{
+    "0": {
+        "disease": "Apple Scab",
+        "crop": "Apple",
+        "treatment": "Prune infected branches, use fungicides like captan, and plant resistant varieties."
+    },
+    "1": {
+        "disease": "Apple Black Rot",
+        "crop": "Apple",
+        "treatment": "Remove mummified fruit and cankers, apply lime sulfur during dormancy."
+    },
+    "2": {
+        "disease": "Apple Cedar Rust",
+        "crop": "Apple",
+        "treatment": "Remove nearby juniper bushes, apply fungicides at bloom stage."
+    },
+    "3": {
+        "disease": "Corn Common Rust",
+        "crop": "Corn",
+        "treatment": "Plant resistant hybrids, apply fungicides if infection is early and severe."
+    },
+    "4": {
+        "disease": "Corn Gray Leaf Spot",
+        "crop": "Corn",
+        "treatment": "Crop rotation, tillage to bury residue, and resistant varieties."
+    },
+    "5": {
+        "disease": "Grape Black Rot",
+        "crop": "Grape",
+        "treatment": "Prune to improve airflow, apply fungicides from bloom until fruit coloring."
+    },
+    "6": {
+        "disease": "Grape Esca (Black Measles)",
+        "crop": "Grape",
+        "treatment": "Protect pruning wounds with sealant, remove and destroy infected vines."
+    },
+    "7": {
+        "disease": "Grape Leaf Blight",
+        "crop": "Grape",
+        "treatment": "Apply fungicides regularly and ensure proper vineyard hygiene."
+    },
+    "8": {
+        "disease": "Potato Early Blight",
+        "crop": "Potato",
+        "treatment": "Ensure adequate nitrogen, rotate crops, and apply chlorothalonil."
+    },
+    "9": {
+        "disease": "Potato Late Blight",
+        "crop": "Potato",
+        "treatment": "Destroy cull piles, use certified seed, and apply protectant fungicides."
+    },
+    "10": {
+        "disease": "Rice Bacterial Blight",
+        "crop": "Rice",
+        "treatment": "Use balanced fertilizer, plant resistant varieties, and avoid flooding."
+    },
+    "11": {
+        "disease": "Rice Leaf Blast",
+        "crop": "Rice",
+        "treatment": "Avoid excessive nitrogen, use fungicides like tricyclazole, and resistant seeds."
+    },
+    "12": {
+        "disease": "Tomato Bacterial Spot",
+        "crop": "Tomato",
+        "treatment": "Use copper-based bactericides and avoid overhead irrigation."
+    },
+    "13": {
+        "disease": "Tomato Early Blight",
+        "crop": "Tomato",
+        "treatment": "Mulch the soil, remove lower leaves, and apply fungicides."
+    },
+    "14": {
+        "disease": "Tomato Yellow Leaf Curl Virus",
+        "crop": "Tomato",
+        "treatment": "Control whiteflies using insecticides or neem oil, and use silver mulches."
+    },
+    "15": {
+        "disease": "Banana Black Sigatoka",
+        "crop": "Banana",
+        "treatment": "Prune infected leaves, improve drainage, and apply fungicides like mancozeb."
+    },
+    "16": {
+        "disease": "Healthy Banana Leaf",
+        "crop": "Banana",
+        "treatment": "Continue regular watering and fertilization. Ensure good sunlight."
+    },
+    "17": {
+        "disease": "Mango Anthracnose",
+        "crop": "Mango",
+        "treatment": "Prune infected twigs, apply copper-based fungicides before flowering."
+    },
+    "18": {
+        "disease": "Mango Mealybug",
+        "crop": "Mango",
+        "treatment": "Apply sticky bands on trunks, use neem oil or insecticidal soaps."
+    },
+    "19": {
+        "disease": "Coffee Leaf Rust",
+        "crop": "Coffee",
+        "treatment": "Plant resistant varieties (e.g., Catimor), apply copper fungicides during rains."
+    },
+    "20": {
+        "disease": "Rubber Leaf Spot",
+        "crop": "Rubber",
+        "treatment": "Improve plantation hygiene, apply mancozeb or carbendazim sprays."
+    },
+    "21": {
+        "disease": "Tea Blister Blight",
+        "crop": "Tea",
+        "treatment": "Prune to improve air circulation, apply copper oxychloride fungicides."
+    },
+    "22": {
+        "disease": "Sugarcane Red Rot",
+        "crop": "Sugarcane",
+        "treatment": "Use healthy sets for planting, practice crop rotation, and avoid waterlogging."
+    },
+    "23": {
+        "disease": "Wheat Leaf Rust",
+        "crop": "Wheat",
+        "treatment": "Apply fungicides like tebuconazole, and plant rust-resistant cultivars."
+    },
+    "24": {
+        "disease": "Potato Black Scurf",
+        "crop": "Potato",
+        "treatment": "Use pathogen-free seed tubers and practice crop rotation with non-host crops."
+    },
+    "25": {
+        "disease": "Citrus Canker",
+        "crop": "Citrus",
+        "treatment": "Prune infected shoots, apply copper-based sprays, and control leaf miners."
+    },
+    "26": {
+        "disease": "Cotton Boll Rot",
+        "crop": "Cotton",
+        "treatment": "Improve field ventilation, reduce humidity, and use appropriate fungicides."
+    },
+    "27": {
+        "disease": "Soybean Rust",
+        "crop": "Soybean",
+        "treatment": "Apply preventive fungicides and select early-maturing varieties."
+    }
+}

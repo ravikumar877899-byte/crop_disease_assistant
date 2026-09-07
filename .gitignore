@@ -1,0 +1,38 @@
+# Secrets & Environment Variables
+.env
+*.env
+.env.*
+
+# Python Cache & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+ENV/
+instance/
+*.db
+*.sqlite3
+
+# Uploads & Temporary Cache
+uploads/*
+!uploads/.gitkeep
+*.log
+trace.txt
+process_info.txt
+verbose_import*.txt
+
+# Android Build & Local Configs
+.gradle/
+build/
+android_app/.gradle/
+android_app/build/
+android_app/app/build/
+android_app/local.properties
+android_app/.idea/
+*.iml
+
+# Node / Web App
+web_app/node_modules/
+web_app/dist/
+.DS_Store

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - AI Crop Care</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="animated-bg">
+    <nav>
+        <div class="logo">
+            <i class="fas fa-leaf"></i> AI CropCare
+        </div>
+        <ul class="nav-links">
+            {% if current_user.is_authenticated %}
+                <li><a href="/upload_page">Upload</a></li>
+                <li><a href="/camera_page">Live Camera</a></li>
+                <li><a href="/history">History</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Signup</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="profile-header">
+            <i class="fas fa-seedling floating-icon" style="top: 10%; left: 10%; animation-delay: 0s;"></i>
+            <i class="fas fa-wheat-awn floating-icon" style="top: 15%; right: 15%; animation-delay: 1s;"></i>
+            <i class="fas fa-leaf floating-icon" style="bottom: 20%; left: 15%; animation-delay: 2s;"></i>
+            <i class="fas fa-cloud-sun floating-icon" style="bottom: 10%; right: 10%; animation-delay: 3s;"></i>
+            
+            <div class="profile-avatar">
+                <img src="{{ url_for('static', filename='images/farmer_crop_logo.png') }}" alt="Farmer Logo">
+            </div>
+            <h1 style="position: relative; z-index: 10;">{{ user.name }}</h1>
+            <p style="position: relative; z-index: 10;">Member since {{ user.joined_date.strftime('%B %Y') }}</p>
+        </div>
+
+        <div class="profile-details-card">
+            <h2>Account Details</h2>
+            <div class="detail-item">
+                <label>Default Name:</label>
+                <span>{{ user.name }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Farming Location:</label>
+                <span>{{ user.location }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Account Type:</label>
+                <span>Farmer (Standard)</span>
+            </div>
+            <br>
+            <button class="btn btn-secondary">Edit Profile</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 AI-Based Crop Disease Detection Assistant</p>
+    </footer>
+</body>
+</html>

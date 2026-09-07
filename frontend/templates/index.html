@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Crop Care - Smart Disease Detection</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Using FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="animated-bg">
+    <nav>
+        <div class="logo">
+            <i class="fas fa-leaf"></i> AI CropCare
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            {% if current_user.is_authenticated %}
+                <li><a href="/upload_page">Upload</a></li>
+                <li><a href="/camera_page">Live Camera</a></li>
+                <li><a href="/history">History</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/register">Signup</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container hero">
+        <h1>Detect Crop Diseases Instantly</h1>
+        <p>Expert AI assistance at your fingertips. Protect your harvest with rapid, accurate leaf disease detection and proven treatment recommendations.</p>
+        <div class="card-grid">
+            <div class="card">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h2>Upload Image</h2>
+                <p>Select a leaf photo from your gallery for instant analysis.</p>
+                <a href="/upload_page" class="btn">Start Upload</a>
+            </div>
+            <div class="card">
+                <i class="fas fa-camera"></i>
+                <h2>Live Detection</h2>
+                <p>Use your phone's camera to scan plants in real-world time.</p>
+                <a href="/camera_page" class="btn">Open Camera</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 AI-Based Crop Disease Detection Assistant | Final Year Project</p>
+    </footer>
+</body>
+</html>

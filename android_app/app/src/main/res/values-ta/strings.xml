@@ -1,0 +1,110 @@
+<resources>
+    <string name="app_name">AI பயிர் பாதுகாப்பு 🌱</string>
+    <string name="tagline">நுண்ணறிவு விவசாய AI மற்றும் பயிர் நோய் கண்டறிதல்</string>
+    
+    <!-- Auth -->
+    <string name="login_title">வணக்கம் உழவரே</string>
+    <string name="login_subtitle">பயிர் நோய்களைக் கண்டறிந்து பண்ணை நலனைப் பாதுகாக்க உள்நுழையவும்</string>
+    <string name="email_or_username">மின்னஞ்சல் முகவரி</string>
+    <string name="password">கடவுச்சொல்</string>
+    <string name="login_button">உள்நுழைய</string>
+    <string name="no_account">புதிய கணக்கு தொடங்க வேண்டுமா?</string>
+    <string name="register_here">புதிய கணக்கை உருவாக்கு</string>
+    <string name="register_title">AI பயிர் பாதுகாப்பில் சேருங்கள்</string>
+    <string name="register_subtitle">நவீன AI தொழில்நுட்பத்துடன் கூடிய விவசாய வழிகாட்டுதல்</string>
+    <string name="full_name">முழு பெயர்</string>
+    <string name="farm_location">மாவட்டம் / பகுதி</string>
+    <string name="register_button">பதிவு செய்க</string>
+    <string name="already_have_account">ஏற்கனவே கணக்கு உள்ளதா?</string>
+    <string name="login_here">உள்நுழையவும்</string>
+    <string name="logout">வெளியேறு</string>
+    <string name="server_settings">சேவையக அமைப்புகள் (Server Settings)</string>
+    <string name="server_url">சர்வர் முகவரி (URL)</string>
+    <string name="save_server">சேமித்து இணைக்கவும்</string>
+
+    <!-- Home Dashboard -->
+    <string name="home_title">AI பயிர் பாதுகாப்பு</string>
+    <string name="greeting_farmer">வணக்கம், %1$s 🌱</string>
+    <string name="weather_card_title">பண்ணை வானிலை ஆலோசனை</string>
+    <string name="weather_temp">வெப்பநிலை</string>
+    <string name="weather_humidity">ஈரப்பதம்</string>
+    <string name="weather_condition">வானிலை நிலை</string>
+    <string name="quick_actions">நோய் கண்டறியும் கருவிகள்</string>
+    
+    <string name="action_scan">பயிரை ஸ்கேன் செய்க</string>
+    <string name="action_scan_desc">கேமரா மூலம் இலை நோயை உடனடியாகக் கண்டறியுங்கள்</string>
+    
+    <string name="action_upload">படத்தைப் பதிவேற்றவும்</string>
+    <string name="action_upload_desc">கேலரியில் இருந்து இலை புகைப்படத்தைத் தேர்ந்தெடுக்கவும்</string>
+    
+    <string name="action_history">நோய் வரலாறு</string>
+    <string name="action_history_desc">முந்தைய சோதனைகள் மற்றும் சிகிச்சைகள்</string>
+    
+    <string name="action_chatbot">கிருஷி AI வழிகாட்டி</string>
+    <string name="action_chatbot_desc">24/7 உழவர் உதவி சாட்பாட்</string>
+    
+    <string name="language_toggle">மொழி / Language</string>
+    <string name="language_en">English</string>
+    <string name="language_ta">தமிழ்</string>
+
+    <!-- Camera / Scan Screen -->
+    <string name="scan_title">நேரடி இலை ஸ்கேனர்</string>
+    <string name="scan_instruction">பாதிக்கப்பட்ட இலையை பச்சை சட்டகத்திற்குள் சரியாக வையுங்கள்</string>
+    <string name="capture_button">புகைப்படம் எடு</string>
+    <string name="retake_button">மீண்டும் எடு</string>
+    <string name="analyze_button">AI மூலம் பகுப்பாய்வு செய்க</string>
+    <string name="camera_permission_needed">இலைகளை ஸ்கேன் செய்ய கேமரா அனுமதி தேவை</string>
+    <string name="grant_permission">அனுமதி வழங்குக</string>
+
+    <!-- Upload Screen -->
+    <string name="upload_title">இலை படத்தைப் பதிவேற்றுக</string>
+    <string name="upload_instruction">உங்கள் சாதனத்திலிருந்து தெளிவான இலை புகைப்படத்தைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="select_gallery">கேலரியில் இருந்து தேர்வு செய்</string>
+    <string name="analyzing_title">AI பகுப்பாய்வு நடக்கிறது…</string>
+    <string name="analyzing_desc">MobileNetV2 AI மாடல் மூலம் இலை ஆய்வு செய்யப்படுகிறது</string>
+
+    <!-- Analysis Result Screen -->
+    <string name="result_title">AI நோயறிதல் அறிக்கை</string>
+    <string name="crop_label">பயிர்</string>
+    <string name="disease_label">கண்டறியப்பட்ட நோய்</string>
+    <string name="scientific_name">தாவரவியல் பெயர்</string>
+    <string name="status_healthy">ஆரோக்கியமான பயிர்</string>
+    <string name="status_diseased">நோய் தாக்கியுள்ளது</string>
+    <string name="confidence_score">AI துல்லியம்</string>
+    <string name="affected_severity">பாதிப்பு அளவு</string>
+    <string name="visual_observations">அறிகுறிகள் மற்றும் கவனிப்புகள்</string>
+    <string name="view_treatment">முழு சிகிச்சை முறைகளைக் காண்க</string>
+    <string name="scan_another">மற்றொரு இலையை ஸ்கேன் செய்க</string>
+
+    <!-- Treatment Screen -->
+    <string name="treatment_title">பரிந்துரைக்கப்பட்ட சிகிச்சைகள்</string>
+    <string name="treatment_management">செய்ய வேண்டிய நடவடிக்கைகள்</string>
+    <string name="organic_remedies">இயற்கை மற்றும் கரிம தீர்வுகள்</string>
+    <string name="chemical_remedies">ரசாயன மருந்துகள்</string>
+    <string name="prevention_tips">தடுப்பு முறைகள்</string>
+    <string name="share_report">பரிந்துரையைப் பகிரவும்</string>
+
+    <!-- History Screen -->
+    <string name="history_title">நோயறிதல் வரலாறு</string>
+    <string name="no_history">முந்தைய இலை சோதனைகள் எதுவும் இல்லை</string>
+    <string name="scanned_on">சோதிக்கப்பட்ட நாள்: %1$s</string>
+    <string name="delete_scan">பதிவை நீக்கு</string>
+    <string name="delete_confirm">இந்த பதிவை வரலாற்றிலிருந்து நீக்க விரும்புகிறீர்களா?</string>
+    <string name="cancel">ரத்து செய்</string>
+    <string name="delete">நீக்கு</string>
+
+    <!-- Chatbot Screen -->
+    <string name="chatbot_title">கிருஷி AI வேளாண் ஆலோசகர்</string>
+    <string name="chatbot_subtitle">பயிர் பாதுகாப்பு, உரம் மற்றும் பூச்சி மேலாண்மை பற்றிக் கேளுங்கள்</string>
+    <string name="chat_placeholder">உங்கள் விவசாய கேள்வியை இங்கே தட்டச்சு செய்யவும்…</string>
+    <string name="chat_send">அனுப்பு</string>
+    <string name="chip_pest">இலைப்புழுக்களைக் கட்டுப்படுத்துவது எப்படி?</string>
+    <string name="chip_fertilizer">தக்காளிக்கான இயற்கை NPK உர அளவு</string>
+    <string name="chip_fungus">இயற்கை பூஞ்சாணக் கொல்லி (வேப்பெண்ணெய் &amp; மோர் கரைசல்)</string>
+
+    <!-- General Feedback -->
+    <string name="loading">காத்திருக்கவும்…</string>
+    <string name="error_network">AI சேவையகத்துடன் இணைக்க முடியவில்லை. இணையத்தை சரிபார்க்கவும்.</string>
+    <string name="error_generic">ஒரு பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="success">வெற்றிகரமாக முடிந்தது.</string>
+</resources>

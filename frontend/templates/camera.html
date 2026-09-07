@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Camera - AI Crop Care</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .capture-btn { margin-top: 1.5rem; background: var(--accent-color); font-size: 1.1rem;}
+        #uploading-message {display: none; color: var(--primary-color); margin-top: 1.5rem; font-weight: bold; font-size: 1.1rem; animation: pulse 1.5s infinite;}
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body class="animated-bg">
+    <nav>
+        <div class="logo">
+            <i class="fas fa-leaf"></i> AI CropCare
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            {% if current_user.is_authenticated %}
+                <li><a href="/upload_page">Upload</a></li>
+                <li><a href="/camera_page">Live Camera</a></li>
+                <li><a href="/history">History</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Signup</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="hero" style="padding: 2rem 0;">
+            <h1>Live Disease Detection</h1>
+            <p>Point your camera towards the plant leaf and capture for analysis.</p>
+        </div>
+
+        <div class="camera-container">
+            <video id="camera-feed" autoplay playsinline></video>
+            
+            <div style="margin-top: 2rem;">
+                <button id="capture-btn" class="btn">
+                    <i class="fas fa-camera"></i> Capture & Analyze
+                </button>
+                <a href="/" class="btn" style="background: #9e9e9e; margin-left: 10px;">Exit Camera</a>
+            </div>
+        </div>
+
+        <div id="result-container" style="display: none; margin-bottom: 4rem;">
+            <!-- Results will be injected here by JS -->
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result - AI Crop Care</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .result-container {max-width: 800px; margin: 3rem auto; padding: 0 1rem;}
+        .treatment-list {margin-top: 1.5rem; padding-left: 20px;}
+        .treatment-list li {margin-bottom: 0.8rem; color: var(--text-light);}
+    </style>
+</head>
+<body class="animated-bg">
+    <nav>
+        <div class="logo">
+            <i class="fas fa-leaf"></i> AI CropCare
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/upload_page">Upload</a></li>
+            <li><a href="/camera_page">Live Camera</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="min-height: 70vh; display: flex; flex-direction: column; justify-content: center;">
+        <div id="result-container">
+            <div class="result-card">
+                <h2>No Prediction Found</h2>
+                <p>Please upload an image or use the live camera to see results here.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="/upload_page" class="btn">Go to Upload</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 AI-Based Crop Disease Detection Assistant | Final Year Project</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

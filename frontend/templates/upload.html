@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image - AI Crop Care</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .file-input-wrapper {margin-top: 1.5rem; margin-bottom: 1.5rem;}
+        input[type="file"] {display: none;}
+        .custom-file-upload {
+            border: 2px dashed var(--primary-color);
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            cursor: pointer;
+            border-radius: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: rgba(46, 125, 50, 0.05);
+        }
+        .custom-file-upload:hover {background: var(--primary-color); color: white;}
+        #uploading-message {display: none; color: var(--primary-color); margin-top: 1.5rem; font-weight: bold; font-size: 1.1rem; animation: pulse 1.5s infinite;}
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body class="animated-bg">
+    <nav>
+        <div class="logo">
+            <i class="fas fa-leaf"></i> AI CropCare
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            {% if current_user.is_authenticated %}
+                <li><a href="/upload_page">Upload</a></li>
+                <li><a href="/camera_page">Live Camera</a></li>
+                <li><a href="/history">History</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Signup</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="hero" style="padding: 2rem 0;">
+            <h1>Upload Plant Leaf</h1>
+            <p>Upload a clear photo of the infected plant leaf for diagnosis.</p>
+        </div>
+
+        <div class="upload-area">
+            <form id="upload-form">
+                <div style="margin-bottom: 2rem;">
+                    <label for="imageUpload" class="btn btn-secondary">
+                        <i class="fas fa-folder-open"></i> Choose Image
+                    </label>
+                    <input type="file" id="imageUpload" name="file" accept="image/*" style="display: none;" required>
+                </div>
+                
+                <img id="preview-img" src="" alt="Selected Image Preview">
+                
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn">Analyze Disease</button>
+                    <a href="/" class="btn" style="background: #9e9e9e; margin-left: 10px;">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <div id="result-container" style="display: none; margin-bottom: 4rem;">
+            <!-- Results will be injected here by JS -->
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

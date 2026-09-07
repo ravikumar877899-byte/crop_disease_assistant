@@ -1,0 +1,42 @@
+Sample Dataset Structure for Model Training
+=========================================
+
+To train a robust CNN model (like the one implemented here), your dataset should follow a directory-based classification structure.
+
+Root Folder: /PlantVillage/
+---------------------------
+Inside the root folder, create subdirectories for each "Crop_Disease" pair.
+
+Example:
+├── Apple_Black_Rot/
+│   ├── image_001.jpg
+│   ├── image_002.jpg
+│   └── ...
+├── Apple_Scab/
+│   ├── image_001.jpg
+│   └── ...
+├── Corn_Common_Rust/
+│   └── ...
+├── Potato_Late_Blight/
+│   └── ...
+├── Rice_Leaf_Blast/
+│   └── ...
+├── Mango_Anthracnose/
+│   └── ...
+├── Coffee_Leaf_Rust/
+│   └── ...
+├── Rubber_Leaf_Spot/
+│   └── ...
+├── Tea_Blister_Blight/
+│   └── ...
+├── Sugarcane_Red_Rot/
+│   └── ...
+└── Tomato_Yellow_Leaf_Curl_Virus/
+    └── ...
+└── ... (repeat for all 23 classes)
+
+Training Notes:
+- Resolution: Images should ideally be 224x224 (as per implementation).
+- Data Augmentation: Use rotation, zoom, and horizontal flips in your Keras ImageDataGenerator to improve accuracy.
+- Split: Recommended split is 80% Training, 10% Validation, 10% Testing.
+- Framework: Use TensorFlow/Keras with a base model like MobileNetV2 or ResNet50 for transfer learning.

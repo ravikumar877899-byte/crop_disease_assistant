@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis History - AI Crop Care</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="animated-bg">
+    <nav>
+        <div class="logo">
+            <i class="fas fa-leaf"></i> AI CropCare
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            {% if current_user.is_authenticated %}
+                <li><a href="/upload_page">Upload</a></li>
+                <li><a href="/camera_page">Live Camera</a></li>
+                <li><a href="/history">History</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Signup</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Scan History</h1>
+        <p>Review your previous detections and treatments.</p>
+
+        <div class="history-list">
+            {% if scans %}
+                {% for scan in scans %}
+                <div class="history-card">
+                    <div class="history-img">
+                        <img src="{{ url_for('static', filename='../uploads/' + scan.image_path) }}" alt="Scan">
+                    </div>
+                    <div class="history-info">
+                        <h3 class="{{ 'status-healthy' if 'healthy' in scan.disease.lower() else 'status-diseased' }}">{{ scan.crop }} - {{ scan.disease }}</h3>
+                        <p class="timestamp"><i class="far fa-clock"></i> {{ scan.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                        <p class="confidence">Confidence: {{ scan.confidence }}%</p>
+                        <div class="treatment-preview">
+                            <strong>Treatment:</strong> {{ scan.treatment[:100] }}{% if scan.treatment|length > 100 %}...{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>No scans yet. Start by uploading an image!</p>
+                    <a href="/upload_page" class="btn">New Scan</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 AI-Based Crop Disease Detection Assistant</p>
+    </footer>
+</body>
+</html>
