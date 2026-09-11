@@ -1,38 +1,51 @@
-# Secrets & Environment Variables
-.env
-*.env
-.env.*
-
-# Python Cache & Virtual Environments
-__pycache__/
-*.py[cod]
-*$py.class
+# Python Virtual Environments
 venv/
 env/
 ENV/
-instance/
+.venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+
+# Database files
 *.db
 *.sqlite3
+database/*.db
 
-# Uploads & Temporary Cache
+# Uploads & Temporary storage
 uploads/*
 !uploads/.gitkeep
-*.log
-trace.txt
-process_info.txt
-verbose_import*.txt
+temp/
+instance/
 
-# Android Build & Local Configs
+# Android build and caches
 .gradle/
 build/
-android_app/.gradle/
-android_app/build/
-android_app/app/build/
-android_app/local.properties
-android_app/.idea/
-*.iml
+*/build/
+*/*/build/
+*.apk
+*.aab
+local.properties
+.cxx/
 
-# Node / Web App
-web_app/node_modules/
-web_app/dist/
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific files
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log

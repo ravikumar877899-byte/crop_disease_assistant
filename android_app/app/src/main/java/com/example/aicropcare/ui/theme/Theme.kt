@@ -1,4 +1,4 @@
-package com.example.aicropcare.theme
+package com.example.aicropcare.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -59,7 +59,7 @@ fun AICropCareTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-
+    
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

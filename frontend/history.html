@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan History - AI CROP CARE</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🌱</div>
+        <div class="brand-text-container">
+          <span class="brand-title">AI CROP CARE <span class="brand-badge">History</span></span>
+          <span class="brand-subtitle">AI Crop Disease Detection and Treatment Assistant</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation">☰</button>
+
+      <nav>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html" class="nav-link">🏠 Home</a></li>
+          <li><a href="dashboard.html" class="nav-link">📊 Dashboard</a></li>
+          <li><a href="scan.html" class="nav-link">📷 Scan Crop</a></li>
+          <li><a href="history.html" class="nav-link active">📜 History</a></li>
+          <li><a href="chatbot.html" class="nav-link">🤖 Chatbot</a></li>
+          <li><a href="#" class="nav-link" id="profile-link">👤 Profile</a></li>
+          <li><a href="#" class="nav-link" id="logout-link">🔒 Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- History Main Section -->
+  <main class="section">
+    <div class="container history-container">
+      
+      <!-- Section Header -->
+      <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+        <h1 class="section-title">Scan History</h1>
+        <p class="section-desc" style="margin: 0;">View records of previously analyzed crop leaves, detected diseases, and treatment recommendations.</p>
+      </div>
+
+      <!-- Empty State Card -->
+      <div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <h2 class="empty-title">No crop scans available yet.</h2>
+        <p class="empty-desc">
+          You have not performed any crop scans yet. When you scan an affected leaf, diagnostic reports and treatment plans will appear here automatically.
+        </p>
+        <a href="scan.html" class="btn btn-primary btn-lg">📷 Start New Scan</a>
+      </div>
+
+      <!-- Phase 1 Notice Box -->
+      <div class="alert alert-info" style="margin-top: 24px;">
+        <div class="alert-icon">💡</div>
+        <div>
+          <strong>Phase 1 Note:</strong>
+          <p style="color: inherit; margin-top: 4px;">
+            SQLite database storage and scan history persistence will be connected in Phase 2.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p class="footer-brand">🌱 AI CROP CARE &bull; AI Crop Disease Detection and Treatment Assistant</p>
+      <p>Phase 1: Project Foundation & Basic UI</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

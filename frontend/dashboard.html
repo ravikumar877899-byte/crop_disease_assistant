@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - AI CROP CARE</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🌱</div>
+        <div class="brand-text-container">
+          <span class="brand-title">AI CROP CARE <span class="brand-badge">Dashboard</span></span>
+          <span class="brand-subtitle">AI Crop Disease Detection and Treatment Assistant</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation">☰</button>
+
+      <nav>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html" class="nav-link">🏠 Home</a></li>
+          <li><a href="dashboard.html" class="nav-link active">📊 Dashboard</a></li>
+          <li><a href="scan.html" class="nav-link">📷 Scan Crop</a></li>
+          <li><a href="history.html" class="nav-link">📜 History</a></li>
+          <li><a href="chatbot.html" class="nav-link">🤖 Chatbot</a></li>
+          <li><a href="#" class="nav-link" id="profile-link">👤 Profile</a></li>
+          <li><a href="#" class="nav-link" id="logout-link">🔒 Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Main Content -->
+  <main class="section">
+    <div class="container">
+      
+      <!-- Welcome Section -->
+      <section class="dashboard-welcome">
+        <h1>Welcome to AI Crop Care</h1>
+        <p>Detect crop diseases early and get treatment guidance using AI.</p>
+        <div class="dashboard-actions">
+          <a href="scan.html" class="btn btn-secondary">📷 Start Crop Scan</a>
+          <a href="chatbot.html" class="btn btn-outline" style="background-color: rgba(255,255,255,0.9); border:none;">💬 Ask Krishi AI</a>
+        </div>
+      </section>
+
+      <!-- Farmer Advisory Banner -->
+      <div class="advisory-box">
+        <div class="advisory-icon">🌾</div>
+        <div class="advisory-content">
+          <h4>Farmer Daily Advisory</h4>
+          <p>Inspect crops regularly for early discoloration or leaf spotting. Catching fungal and bacterial symptoms early increases treatment efficacy by over 80%.</p>
+        </div>
+      </div>
+
+      <!-- Feature Cards Grid (5 Cards) -->
+      <section>
+        <h2 class="section-title" style="margin-bottom: 20px; font-size: 1.6rem;">Quick Services</h2>
+        <div class="feature-cards-grid">
+          
+          <!-- Card 1: Scan Crop -->
+          <div class="feature-card">
+            <div>
+              <div class="feature-header">
+                <div class="feature-icon-wrapper">📷</div>
+                <span class="badge badge-green">Core Feature</span>
+              </div>
+              <h3>Scan Crop</h3>
+              <p>Upload or capture a leaf image for AI analysis.</p>
+            </div>
+            <a href="scan.html" class="btn btn-primary">Open Scanner →</a>
+          </div>
+
+          <!-- Card 2: Disease Detection -->
+          <div class="feature-card">
+            <div>
+              <div class="feature-header">
+                <div class="feature-icon-wrapper">🔬</div>
+                <span class="badge badge-amber">AI Vision</span>
+              </div>
+              <h3>Disease Detection</h3>
+              <p>Identify possible crop diseases using AI.</p>
+            </div>
+            <a href="scan.html" class="btn btn-outline">Check Diseases →</a>
+          </div>
+
+          <!-- Card 3: Treatment Advice -->
+          <div class="feature-card">
+            <div>
+              <div class="feature-header">
+                <div class="feature-icon-wrapper">💊</div>
+                <span class="badge badge-blue">Care Guide</span>
+              </div>
+              <h3>Treatment Advice</h3>
+              <p>Get simple treatment recommendations.</p>
+            </div>
+            <a href="chatbot.html" class="btn btn-outline">View Guidance →</a>
+          </div>
+
+          <!-- Card 4: Scan History -->
+          <div class="feature-card">
+            <div>
+              <div class="feature-header">
+                <div class="feature-icon-wrapper">📜</div>
+                <span class="badge badge-green">Records</span>
+              </div>
+              <h3>Scan History</h3>
+              <p>View your previous crop scans.</p>
+            </div>
+            <a href="history.html" class="btn btn-outline">View History →</a>
+          </div>
+
+          <!-- Card 5: AI Chatbot -->
+          <div class="feature-card">
+            <div>
+              <div class="feature-header">
+                <div class="feature-icon-wrapper">🤖</div>
+                <span class="badge badge-amber">Assistant</span>
+              </div>
+              <h3>AI Chatbot</h3>
+              <p>Ask questions about crops and diseases.</p>
+            </div>
+            <a href="chatbot.html" class="btn btn-primary">Talk to Krishi AI →</a>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p class="footer-brand">🌱 AI CROP CARE &bull; AI Crop Disease Detection and Treatment Assistant</p>
+      <p>Phase 1: Project Foundation & Basic UI</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

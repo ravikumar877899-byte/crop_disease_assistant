@@ -1,4 +1,4 @@
-package com.example.aicropcare.theme
+package com.example.aicropcare.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -34,27 +34,3 @@ val AgriDanger = Color(0xFFDC2626)
 val AgriDangerContainer = Color(0xFFFEE2E2)
 val AgriInfo = Color(0xFF0284C7)
 val AgriInfoContainer = Color(0xFFE0F2FE)
-
-// Legacy aliases for repository backwards compatibility
-val AgriGreenPrimary = AgriPrimary
-val AgriGreenSecondary = AgriPrimaryDark
-val AgriGreenTertiary = AgriPrimaryLight
-val AgriGreenLight = AgriPrimaryContainer
-val AgriGreenContainer = AgriPrimaryContainer
-val AgriOnGreenContainer = AgriOnPrimaryContainer
-val AgriHealthyGreen = AgriPrimary
-val AgriWarningAmber = AgriSecondary
-val AgriAmberAccent = AgriSecondary
-val AgriBgLight = AgriBackground
-val AgriCardBg = AgriSurface
-val AgriCardGlass = AgriSurface
-val AgriCardGlassBorder = AgriBorder
-val AgriTextDark = AgriTextPrimary
-val AgriTextGrey = AgriTextSecondary
-val AgriDangerRed = AgriDanger
-val AgriSuccessGreen = AgriSuccess
-val AgriGreenPrimaryDark = AgriPrimaryDark
-val AgriGreenContainerDark = Color(0xFF1B5E20)
-val AgriBgDark = Color(0xFF121814)
-val AgriSurfaceDark = Color(0xFF1E2620)
-val AgriSurfaceLight = Color(0xFFFFFFFF)

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan Your Crop - AI CROP CARE</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🌱</div>
+        <div class="brand-text-container">
+          <span class="brand-title">AI CROP CARE <span class="brand-badge">Scanner</span></span>
+          <span class="brand-subtitle">AI Crop Disease Detection and Treatment Assistant</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation">☰</button>
+
+      <nav>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html" class="nav-link">🏠 Home</a></li>
+          <li><a href="dashboard.html" class="nav-link">📊 Dashboard</a></li>
+          <li><a href="scan.html" class="nav-link active">📷 Scan Crop</a></li>
+          <li><a href="history.html" class="nav-link">📜 History</a></li>
+          <li><a href="chatbot.html" class="nav-link">🤖 Chatbot</a></li>
+          <li><a href="#" class="nav-link" id="profile-link">👤 Profile</a></li>
+          <li><a href="#" class="nav-link" id="logout-link">🔒 Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Scan Page Main Section -->
+  <main class="section">
+    <div class="container scan-container">
+      
+      <!-- Section Header -->
+      <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+        <h1 class="section-title">Scan Your Crop</h1>
+        <p class="section-desc" style="margin: 0;">Upload or capture a clear photo of your plant's infected leaf to identify crop diseases.</p>
+      </div>
+
+      <!-- Hidden File Inputs -->
+      <input type="file" id="crop-image-input" accept="image/*" style="display: none;">
+      <input type="file" id="camera-image-input" accept="image/*" capture="environment" style="display: none;">
+
+      <!-- Upload Zone -->
+      <div class="upload-card" id="upload-dropzone">
+        <div class="upload-icon">🌿</div>
+        <h2 class="upload-title">Drop your leaf photo here</h2>
+        <p class="upload-hint">Supports JPG, PNG, and WEBP formats</p>
+        
+        <div class="upload-buttons">
+          <button type="button" class="btn btn-primary" id="upload-btn">📁 Upload Image</button>
+          <button type="button" class="btn btn-secondary" id="open-camera-btn">📸 Open Camera</button>
+        </div>
+      </div>
+
+      <!-- Image Preview Area -->
+      <div class="preview-container" id="preview-container">
+        <div class="preview-content">
+          <div class="preview-img-wrapper">
+            <img id="preview-image" src="" alt="Crop Preview">
+          </div>
+          <div class="preview-details">
+            <p class="preview-filename" id="preview-filename">crop-leaf.jpg</p>
+            <p class="preview-filesize" id="preview-filesize">0 KB</p>
+            <button type="button" class="btn btn-sm btn-outline" id="remove-image-btn" style="color: var(--danger); border-color: var(--danger);">🗑️ Remove / Change Photo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <button type="button" class="btn btn-primary btn-lg" id="analyze-crop-btn" style="width: 100%; max-width: 320px;">
+          🔍 Analyze Crop
+        </button>
+      </div>
+
+      <!-- Phase 1 Temporary Notice (Visible upon Analyze click) -->
+      <div class="alert alert-phase" id="phase-notice" style="display: none;">
+        <div class="alert-icon">ℹ️</div>
+        <div>
+          <strong>Phase 1 Notice:</strong>
+          <p style="color: inherit; margin-top: 4px;">
+            AI analysis will be available in the next phase. The machine learning model integration and diagnosis pipeline will be implemented in subsequent phases.
+          </p>
+        </div>
+      </div>
+
+      <!-- Photography Tips for Farmers -->
+      <div class="advisory-box" style="background-color: var(--bg-card); border: 1px solid var(--border-color);">
+        <div class="advisory-icon">💡</div>
+        <div class="advisory-content">
+          <h4 style="color: var(--primary-dark);">Tips for Best Disease Detection Results</h4>
+          <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">
+            <li>Ensure the leaf is well lit using natural outdoor daylight.</li>
+            <li>Center the infected spots, mildew, or lesions in the frame.</li>
+            <li>Avoid blurry or out-of-focus camera shots.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p class="footer-brand">🌱 AI CROP CARE &bull; AI Crop Disease Detection and Treatment Assistant</p>
+      <p>Phase 1: Project Foundation & Basic UI</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
