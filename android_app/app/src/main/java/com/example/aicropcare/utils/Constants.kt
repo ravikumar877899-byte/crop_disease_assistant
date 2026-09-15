@@ -5,9 +5,8 @@ object Constants {
     const val APP_SUBTITLE = "AI Crop Disease Detection and Treatment Assistant"
     
     // Centralized Base URL configuration
-    // 10.0.2.2:5000 is used by the Android Emulator to connect to Windows host localhost:5000
-    // For physical Android devices connected via Wi-Fi/LAN, set to http://<YOUR_PC_IP>:5000/
-    const val DEFAULT_BASE_URL = "http://10.0.2.2:5000/"
+    // Production Render Flask Backend (HTTPS)
+    const val DEFAULT_BASE_URL = "https://aicropcare-backend.onrender.com/"
     
     // Placeholder messages for Phase 2/3 UI
     const val MSG_CAMERA_FUTURE = "Camera scanning will be enabled in a future phase."
