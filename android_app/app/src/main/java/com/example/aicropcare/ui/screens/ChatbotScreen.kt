@@ -317,6 +317,7 @@ fun ChatbotScreen(
                         focusedPlaceholderColor = AgriTextSecondary,
                         unfocusedPlaceholderColor = AgriTextSecondary
                     ),
+                    textStyle = androidx.compose.material3.LocalTextStyle.current.copy(color = AgriTextPrimary),
                     singleLine = true,
                     enabled = !isLoading
                 )

@@ -184,6 +184,7 @@ fun RegisterScreen(
                         focusedPlaceholderColor = AgriTextSecondary,
                         unfocusedPlaceholderColor = AgriTextSecondary
                     ),
+                    textStyle = androidx.compose.material3.LocalTextStyle.current.copy(color = AgriTextPrimary),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -224,6 +225,7 @@ fun RegisterScreen(
                         focusedPlaceholderColor = AgriTextSecondary,
                         unfocusedPlaceholderColor = AgriTextSecondary
                     ),
+                    textStyle = androidx.compose.material3.LocalTextStyle.current.copy(color = AgriTextPrimary),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
@@ -274,6 +276,7 @@ fun RegisterScreen(
                         focusedPlaceholderColor = AgriTextSecondary,
                         unfocusedPlaceholderColor = AgriTextSecondary
                     ),
+                    textStyle = androidx.compose.material3.LocalTextStyle.current.copy(color = AgriTextPrimary),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
@@ -324,6 +327,7 @@ fun RegisterScreen(
                         focusedPlaceholderColor = AgriTextSecondary,
                         unfocusedPlaceholderColor = AgriTextSecondary
                     ),
+                    textStyle = androidx.compose.material3.LocalTextStyle.current.copy(color = AgriTextPrimary),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
