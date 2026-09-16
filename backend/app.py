@@ -244,11 +244,13 @@ def predict_crop_disease():
     result = gemini_service.analyze_crop_leaf(saved_filepath)
 
     if result.get("status") == "error":
-        return jsonify(result), 502 if "unavailable" in result.get("message", "").lower() else 400
+        if result.get("code") == "QUOTA_EXCEEDED" or "usage limit" in result.get("message", "").lower():
+            return jsonify(result), 429
+        return jsonify(result), 503 if "unavailable" in result.get("message", "").lower() else 400
 
     return jsonify(result), 200
 
-# ----------------- PHASE 9 KRISHI AI CHATBOT ROUTES -----------------
+# ----------------- PHASE 9 & 11 KRISHI AI CHATBOT ROUTES -----------------
 
 @app.route('/api/chatbot', methods=['POST'])
 @app.route('/api/ai/chat', methods=['POST'])
@@ -269,8 +271,12 @@ def chatbot_query():
         }), 400
 
     result = gemini_service.chat_with_krishi_ai(message, history)
-    status_code = 200 if result.get("status") == "success" else (502 if "unavailable" in result.get("message", "").lower() else 400)
-    return jsonify(result), status_code
+    if result.get("status") == "error":
+        if result.get("code") == "QUOTA_EXCEEDED" or "usage limit" in result.get("message", "").lower():
+            return jsonify(result), 429
+        return jsonify(result), 503 if "unavailable" in result.get("message", "").lower() else 400
+
+    return jsonify(result), 200
 
 # ----------------- STATIC UPLOADS & FRONTEND ROUTES -----------------
 

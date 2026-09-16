@@ -22,68 +22,104 @@ GEMINI_KEYS: List[str] = []
 for i in range(1, 11):
     key_name = "GEMINI_API_KEY" if i == 1 else f"GEMINI_API_KEY_{i}"
     k = os.getenv(key_name)
-    if k and k.strip():
+    if k and k.strip() and k.strip() not in GEMINI_KEYS:
         GEMINI_KEYS.append(k.strip())
 
 _current_key_idx = 0
-_configured_model: Optional[Any] = None
-_configured_model_name: Optional[str] = None
 
-# Prioritized candidate models compatible with multimodal vision
+# Prioritized currently active and verified candidate models compatible with vision and text
 CANDIDATE_MODELS = [
     'gemini-2.5-flash',
-    'gemini-1.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-pro',
-    'gemini-2.5-pro',
     'gemini-flash-latest',
-    'gemini-pro-vision'
+    'gemini-flash-lite-latest'
 ]
 
-def _init_gemini_client(key_index: int) -> Tuple[bool, Optional[Any], Optional[str]]:
-    """Initialize genai with the specified key index and locate a working model."""
-    if not GEMINI_KEYS or key_index >= len(GEMINI_KEYS):
-        return False, None, None
+def sanitize_log_message(msg: str) -> str:
+    """Removes any API key patterns or sensitive credentials from log strings."""
+    return re.sub(r'AIza[0-9A-Za-z\-_]{35}', 'AIza...[MASKED]', str(msg))
 
-    try:
-        api_key = GEMINI_KEYS[key_index]
-        genai.configure(api_key=api_key)
+def classify_gemini_error(err_str: str) -> str:
+    """
+    Classifies a Gemini API error into:
+    - 'DAILY_QUOTA_EXCEEDED': Project daily quota or RPD limit reached
+    - 'TRANSIENT_RATE_LIMIT': Temporary RPM / concurrency throttle (retryable)
+    - 'MODEL_NOT_FOUND': 404 / shut down / deprecated model
+    - 'OTHER': Other exception
+    """
+    err_lower = err_str.lower()
+    if (
+        "generaterequestsperday" in err_lower
+        or "perday" in err_lower
+        or "daily" in err_lower
+        or "exceeded your current quota" in err_lower
+    ):
+        return "DAILY_QUOTA_EXCEEDED"
+    elif (
+        "429" in err_str
+        or "resource_exhausted" in err_lower
+        or "resourceexhausted" in err_lower
+        or "rate limit" in err_lower
+        or "ratelimit" in err_lower
+        or "usage limit" in err_lower
+    ):
+        return "TRANSIENT_RATE_LIMIT"
+    elif (
+        "404" in err_str
+        or "not found" in err_lower
+        or "no longer available" in err_lower
+        or "is deprecated" in err_lower
+    ):
+        return "MODEL_NOT_FOUND"
+    return "OTHER"
 
-        # Directly instantiate prioritized candidate models
-        for cand in CANDIDATE_MODELS:
+def diagnose_models() -> List[Dict[str, Any]]:
+    """
+    Safely diagnoses model availability across configured API keys without exposing secrets.
+    """
+    results = []
+    if not GEMINI_KEYS:
+        return [{"status": "error", "message": "No GEMINI_API_KEY configured."}]
+
+    for idx, key in enumerate(GEMINI_KEYS):
+        try:
+            genai.configure(api_key=key)
+        except Exception as e:
+            results.append({
+                "key_index": idx + 1,
+                "model": "ALL",
+                "available": False,
+                "category": f"CONFIG_FAILED: {sanitize_log_message(str(e))}"
+            })
+            continue
+
+        for model_name in CANDIDATE_MODELS:
             try:
-                model = genai.GenerativeModel(cand)
-                return True, model, cand
-            except Exception:
-                continue
-
-        return False, None, None
-    except Exception:
-        return False, None, None
-
-
-def configure_service() -> bool:
-    """Configures the Gemini Vision AI service with the first available key."""
-    global _current_key_idx, _configured_model, _configured_model_name
-    for idx in range(len(GEMINI_KEYS)):
-        ok, model, name = _init_gemini_client(idx)
-        if ok and model:
-            _current_key_idx = idx
-            _configured_model = model
-            _configured_model_name = name
-            return True
-    return False
-
-# Initialize on module load
-configure_service()
+                m = genai.GenerativeModel(model_name)
+                res = m.generate_content("Ping")
+                results.append({
+                    "key_index": idx + 1,
+                    "model": model_name,
+                    "available": True,
+                    "category": "AVAILABLE"
+                })
+            except Exception as e:
+                err = str(e)
+                cat = classify_gemini_error(err)
+                results.append({
+                    "key_index": idx + 1,
+                    "model": model_name,
+                    "available": False,
+                    "category": cat
+                })
+    return results
 
 def analyze_crop_leaf(image_path: str) -> Dict[str, Any]:
     """
     Analyzes an uploaded leaf image using Gemini Vision AI.
-    Performs key rotation across configured keys if quota or transient errors occur.
-    Returns structured diagnosis or a clear error.
+    Applies multi-model fallback across active models and key rotation.
+    Returns structured diagnosis or clean user-friendly error without raw stacks.
     """
-    global _current_key_idx, _configured_model, _configured_model_name
+    global _current_key_idx
 
     if not os.path.exists(image_path):
         return {
@@ -95,17 +131,17 @@ def analyze_crop_leaf(image_path: str) -> Dict[str, Any]:
     if not GEMINI_KEYS:
         return {
             "status": "error",
-            "message": "Gemini API key is not configured in backend/.env.",
+            "code": "CONFIG_ERROR",
+            "message": "Gemini AI service is not configured.",
             "is_clear": False
         }
 
-    # Verify and open image
     try:
         img = Image.open(image_path)
     except Exception as e:
         return {
             "status": "error",
-            "message": f"Failed to open image file: {str(e)}",
+            "message": f"Failed to open image file: {sanitize_log_message(str(e))}",
             "is_clear": False
         }
 
@@ -113,12 +149,13 @@ def analyze_crop_leaf(image_path: str) -> Dict[str, Any]:
         "You are an expert plant pathologist and agricultural scientist. "
         "Analyze this plant leaf photo carefully.\n\n"
         "Identify:\n"
-        "1. Crop name (e.g., Tomato, Rice, Apple, Potato, Corn, Wheat, Banana, Grape, Mango, Cotton, Soybean, etc.)\n"
+        "1. Crop name (e.g., Tomato, Rice, Apple, Potato, Corn, Wheat, Banana, Grape, Mango, Cotton, Soybean, Citrus, etc.)\n"
         "2. Disease name (e.g., Early Blight, Bacterial Spot, Leaf Blast, Rust, etc.) OR 'Healthy' if no disease is detected.\n"
         "3. Confidence score (0 to 100) reflecting your AI visual assessment confidence.\n"
         "4. Observable symptoms (concise summary of discoloration, spots, lesions, or health state).\n"
         "5. Actionable treatment & management advice (list 3-5 clear, practical steps for farmers).\n"
-        "6. Image clarity check: set is_clear to true if a plant leaf is identifiable; set is_clear to false if the image is too blurry, dark, or not a plant.\n\n"
+        "6. Estimated affected leaf percentage (0 for healthy leaf, or 5-100 depending on infection spread).\n"
+        "7. Image clarity check: set is_clear to true if a plant leaf is identifiable; set is_clear to false if the image is too blurry, dark, or not a plant.\n\n"
         "Return ONLY a valid JSON object with the following keys:\n"
         "{\n"
         '  "crop": "Crop Name",\n'
@@ -126,90 +163,125 @@ def analyze_crop_leaf(image_path: str) -> Dict[str, Any]:
         '  "confidence": 92.5,\n'
         '  "symptoms": "Description of visible symptoms",\n'
         '  "treatment": "1. Step one\\n2. Step two\\n3. Step three",\n'
+        '  "affected_percentage": 0,\n'
         '  "is_clear": true\n'
         "}"
     )
 
     num_keys = len(GEMINI_KEYS)
-    last_error = ""
+    encountered_quota_error = False
 
-    # Attempt circular key rotation
     for attempt in range(num_keys):
-        idx = (_current_key_idx + attempt) % num_keys
-        ok, model, model_name = _init_gemini_client(idx)
-        if not ok or model is None:
-            continue
+        key_idx = (_current_key_idx + attempt) % num_keys
+        api_key = GEMINI_KEYS[key_idx]
 
         try:
-            response = model.generate_content([prompt, img])
-            if response and response.text:
-                raw_text = response.text.replace("```json", "").replace("```", "").strip()
-                result_data: Dict[str, Any] = {}
-                
+            genai.configure(api_key=api_key)
+        except Exception as ex:
+            print(f"[Gemini Vision AI] Key {key_idx+1} config failed: {sanitize_log_message(str(ex))}")
+            continue
+
+        for model_name in CANDIDATE_MODELS:
+            # Allow up to 2 retries only for transient rate limits (RPM)
+            max_retries = 2
+            for retry in range(max_retries):
                 try:
-                    result_data = json.loads(raw_text)
-                except Exception:
-                    # Attempt regex extraction if extra text is present
-                    match = re.search(r'\{.*\}', raw_text, re.DOTALL)
-                    if match:
-                        result_data = json.loads(match.group(0))
+                    model = genai.GenerativeModel(model_name)
+                    response = model.generate_content([prompt, img])
+
+                    if response and response.text:
+                        raw_text = response.text.replace("```json", "").replace("```", "").strip()
+                        result_data: Dict[str, Any] = {}
+
+                        try:
+                            result_data = json.loads(raw_text)
+                        except Exception:
+                            match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+                            if match:
+                                result_data = json.loads(match.group(0))
+                            else:
+                                raise ValueError("Could not parse structured JSON from Gemini Vision.")
+
+                        crop_val = str(result_data.get("crop", "Unknown Crop")).strip()
+                        disease_val = str(result_data.get("disease", "Unknown")).strip()
+
+                        try:
+                            conf_val = float(result_data.get("confidence", 0.0))
+                            conf_val = max(0.0, min(100.0, conf_val))
+                        except (ValueError, TypeError):
+                            conf_val = 85.0
+
+                        try:
+                            affected_val = int(result_data.get("affected_percentage", 0))
+                            affected_val = max(0, min(100, affected_val))
+                        except (ValueError, TypeError):
+                            affected_val = 0 if "healthy" in disease_val.lower() else 35
+
+                        symptoms_val = result_data.get("symptoms", "")
+                        if isinstance(symptoms_val, list):
+                            symptoms_val = "\n".join(str(s) for s in symptoms_val)
+                        else:
+                            symptoms_val = str(symptoms_val)
+
+                        treatment_val = result_data.get("treatment", "")
+                        if isinstance(treatment_val, list):
+                            treatment_val = "\n".join(f"{i+1}. {str(t)}" for i, t in enumerate(treatment_val))
+                        else:
+                            treatment_val = str(treatment_val)
+
+                        is_clear_val = bool(result_data.get("is_clear", True))
+
+                        _current_key_idx = key_idx
+
+                        return {
+                            "status": "success",
+                            "crop": crop_val,
+                            "disease": disease_val,
+                            "confidence": round(conf_val, 1),
+                            "affected_percentage": affected_val,
+                            "symptoms": symptoms_val,
+                            "treatment": treatment_val,
+                            "is_clear": is_clear_val,
+                            "engine": f"Gemini Vision AI ({model_name})"
+                        }
+
+                except Exception as e:
+                    err_msg = str(e)
+                    clean_err = sanitize_log_message(err_msg)
+                    err_cat = classify_gemini_error(err_msg)
+
+                    if err_cat == "TRANSIENT_RATE_LIMIT":
+                        encountered_quota_error = True
+                        print(f"[Gemini Vision AI] Transient rate limit on Key {key_idx+1} ({model_name}) retry {retry+1}/{max_retries}: {clean_err[:100]}")
+                        if retry < max_retries - 1:
+                            time.sleep(0.75 * (retry + 1))
+                            continue
+                        else:
+                            break
+                    elif err_cat == "DAILY_QUOTA_EXCEEDED":
+                        encountered_quota_error = True
+                        print(f"[Gemini Vision AI] Daily quota exhausted on Key {key_idx+1} ({model_name}): {clean_err[:100]}")
+                        # Immediately stop retrying this exhausted model
+                        break
+                    elif err_cat == "MODEL_NOT_FOUND":
+                        print(f"[Gemini Vision AI] Model {model_name} not available on Key {key_idx+1}: {clean_err[:100]}")
+                        break
                     else:
-                        raise ValueError("Could not parse JSON response from Gemini Vision.")
+                        print(f"[Gemini Vision AI] Error on Key {key_idx+1} ({model_name}): {clean_err[:100]}")
+                        break
 
-                # Clean up and normalize fields
-                crop_val = str(result_data.get("crop", "Unknown Crop")).strip()
-                disease_val = str(result_data.get("disease", "Unknown")).strip()
-                
-                try:
-                    conf_val = float(result_data.get("confidence", 0.0))
-                    conf_val = max(0.0, min(100.0, conf_val))
-                except (ValueError, TypeError):
-                    conf_val = 85.0
+    if encountered_quota_error:
+        return {
+            "status": "error",
+            "code": "QUOTA_EXCEEDED",
+            "message": "AI service is temporarily unavailable because the Gemini usage limit has been reached. Please try again later.",
+            "is_clear": False
+        }
 
-                symptoms_val = result_data.get("symptoms", "")
-                if isinstance(symptoms_val, list):
-                    symptoms_val = "\n".join(str(s) for s in symptoms_val)
-                else:
-                    symptoms_val = str(symptoms_val)
-
-                treatment_val = result_data.get("treatment", "")
-                if isinstance(treatment_val, list):
-                    treatment_val = "\n".join(f"{i+1}. {str(t)}" for i, t in enumerate(treatment_val))
-                else:
-                    treatment_val = str(treatment_val)
-
-                is_clear_val = bool(result_data.get("is_clear", True))
-
-                # Update current working key
-                _current_key_idx = idx
-                _configured_model = model
-                _configured_model_name = model_name
-
-                return {
-                    "status": "success",
-                    "crop": crop_val,
-                    "disease": disease_val,
-                    "confidence": round(conf_val, 1),
-                    "symptoms": symptoms_val,
-                    "treatment": treatment_val,
-                    "is_clear": is_clear_val,
-                    "engine": f"Gemini Vision AI ({model_name})"
-                }
-
-        except Exception as e:
-            err_msg = str(e)
-            last_error = err_msg
-            if "429" in err_msg or "ResourceExhausted" in err_msg:
-                # Quota exceeded on this key, rotate to next key
-                time.sleep(1)
-                continue
-            else:
-                continue
-
-    # All keys failed
     return {
         "status": "error",
-        "message": f"Gemini Vision AI service unavailable: {last_error or 'Could not process image.'}",
+        "code": "SERVICE_UNAVAILABLE",
+        "message": "AI service is temporarily unavailable. Please try again later.",
         "is_clear": False
     }
 
@@ -218,9 +290,9 @@ def chat_with_krishi_ai(message: str, history: Optional[List[Dict[str, str]]] = 
     """
     Agricultural chatbot assistant powered by Gemini.
     Provides expert agricultural, plant pathology, and crop management guidance.
-    Performs key rotation across configured keys if quota or transient errors occur.
+    Includes multi-model fallback across active models and key rotation with clean quota handling.
     """
-    global _current_key_idx, _configured_model, _configured_model_name
+    global _current_key_idx
 
     if not message or not message.strip():
         return {
@@ -231,7 +303,8 @@ def chat_with_krishi_ai(message: str, history: Optional[List[Dict[str, str]]] = 
     if not GEMINI_KEYS:
         return {
             "status": "error",
-            "message": "Gemini API key is not configured in backend environment."
+            "code": "CONFIG_ERROR",
+            "message": "Gemini AI service is not configured in backend environment."
         }
 
     clean_message = message.strip()
@@ -252,7 +325,7 @@ def chat_with_krishi_ai(message: str, history: Optional[List[Dict[str, str]]] = 
     prompt_parts = [system_prompt]
     if history and isinstance(history, list):
         prompt_parts.append("\nRecent conversation context:")
-        for turn in history[-6:]:  # Keep last few turns for context
+        for turn in history[-6:]:
             role = str(turn.get("role", "user"))
             text = str(turn.get("text", "") or turn.get("content", "")).strip()
             if text:
@@ -262,37 +335,68 @@ def chat_with_krishi_ai(message: str, history: Optional[List[Dict[str, str]]] = 
     final_prompt = "\n".join(prompt_parts)
 
     num_keys = len(GEMINI_KEYS)
-    last_error = ""
+    encountered_quota_error = False
 
     for attempt in range(num_keys):
-        idx = (_current_key_idx + attempt) % num_keys
-        ok, model, model_name = _init_gemini_client(idx)
-        if not ok or model is None:
-            continue
+        key_idx = (_current_key_idx + attempt) % num_keys
+        api_key = GEMINI_KEYS[key_idx]
 
         try:
-            response = model.generate_content(final_prompt)
-            if response and response.text:
-                answer = response.text.strip()
-                _current_key_idx = idx
-                _configured_model = model
-                _configured_model_name = model_name
+            genai.configure(api_key=api_key)
+        except Exception as ex:
+            print(f"[Krishi AI] Key {key_idx+1} config failed: {sanitize_log_message(str(ex))}")
+            continue
 
-                return {
-                    "status": "success",
-                    "response": answer,
-                    "engine": f"Krishi AI ({model_name})"
-                }
-        except Exception as e:
-            err_msg = str(e)
-            last_error = err_msg
-            if "429" in err_msg or "ResourceExhausted" in err_msg:
-                time.sleep(1)
-                continue
-            else:
-                continue
+        for model_name in CANDIDATE_MODELS:
+            max_retries = 2
+            for retry in range(max_retries):
+                try:
+                    model = genai.GenerativeModel(model_name)
+                    response = model.generate_content(final_prompt)
+
+                    if response and response.text:
+                        answer = response.text.strip()
+                        _current_key_idx = key_idx
+
+                        return {
+                            "status": "success",
+                            "response": answer,
+                            "engine": f"Krishi AI ({model_name})"
+                        }
+
+                except Exception as e:
+                    err_msg = str(e)
+                    clean_err = sanitize_log_message(err_msg)
+                    err_cat = classify_gemini_error(err_msg)
+
+                    if err_cat == "TRANSIENT_RATE_LIMIT":
+                        encountered_quota_error = True
+                        print(f"[Krishi AI] Transient rate limit on Key {key_idx+1} ({model_name}) retry {retry+1}/{max_retries}: {clean_err[:100]}")
+                        if retry < max_retries - 1:
+                            time.sleep(0.75 * (retry + 1))
+                            continue
+                        else:
+                            break
+                    elif err_cat == "DAILY_QUOTA_EXCEEDED":
+                        encountered_quota_error = True
+                        print(f"[Krishi AI] Daily quota exhausted on Key {key_idx+1} ({model_name}): {clean_err[:100]}")
+                        break
+                    elif err_cat == "MODEL_NOT_FOUND":
+                        print(f"[Krishi AI] Model {model_name} not available on Key {key_idx+1}: {clean_err[:100]}")
+                        break
+                    else:
+                        print(f"[Krishi AI] Error on Key {key_idx+1} ({model_name}): {clean_err[:100]}")
+                        break
+
+    if encountered_quota_error:
+        return {
+            "status": "error",
+            "code": "QUOTA_EXCEEDED",
+            "message": "Krishi AI is temporarily unavailable. Please try again later."
+        }
 
     return {
         "status": "error",
-        "message": f"Krishi AI service temporarily unavailable: {last_error or 'Could not generate response.'}"
+        "code": "SERVICE_UNAVAILABLE",
+        "message": "Krishi AI is temporarily unavailable. Please try again later."
     }

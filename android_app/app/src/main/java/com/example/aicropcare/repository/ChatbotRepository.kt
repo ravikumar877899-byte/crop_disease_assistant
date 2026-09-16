@@ -48,16 +48,33 @@ class ChatbotRepository(
     }
 
     private fun parseHttpError(e: HttpException): String {
+        if (e.code() == 429) {
+            return "Krishi AI is temporarily unavailable. Please try again later."
+        }
         return try {
             val errorBody = e.response()?.errorBody()?.string()
             if (!errorBody.isNullOrBlank()) {
                 val parsed = gson.fromJson(errorBody, ChatResponse::class.java)
-                parsed.message ?: "Server returned error (${e.code()})."
+                val msg = parsed.message
+                if (!msg.isNullOrBlank()) {
+                    if (msg.contains("quota", ignoreCase = true) ||
+                        msg.contains("usage limit", ignoreCase = true) ||
+                        msg.contains("429") ||
+                        msg.contains("resource_exhausted", ignoreCase = true) ||
+                        msg.contains("resourceexhausted", ignoreCase = true)
+                    ) {
+                        "Krishi AI is temporarily unavailable. Please try again later."
+                    } else {
+                        msg
+                    }
+                } else {
+                    "Krishi AI is temporarily unavailable. Please try again later."
+                }
             } else {
-                "Server returned error (${e.code()})."
+                "Krishi AI is temporarily unavailable. Please try again later."
             }
         } catch (_: Exception) {
-            "Server error (${e.code()}). Please check your connection."
+            "Krishi AI is temporarily unavailable. Please try again later."
         }
     }
 }

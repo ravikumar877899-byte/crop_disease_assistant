@@ -54,16 +54,33 @@ class PredictionRepository(
     }
 
     private fun parseHttpError(e: HttpException): String {
+        if (e.code() == 429) {
+            return "AI service is temporarily unavailable because the Gemini usage limit has been reached. Please try again later."
+        }
         return try {
             val errorBody = e.response()?.errorBody()?.string()
             if (!errorBody.isNullOrBlank()) {
                 val parsed = gson.fromJson(errorBody, PredictionResponse::class.java)
-                parsed.message ?: "Server returned error ${e.code()}."
+                val msg = parsed.message
+                if (!msg.isNullOrBlank()) {
+                    if (msg.contains("quota", ignoreCase = true) ||
+                        msg.contains("usage limit", ignoreCase = true) ||
+                        msg.contains("429") ||
+                        msg.contains("resource_exhausted", ignoreCase = true) ||
+                        msg.contains("resourceexhausted", ignoreCase = true)
+                    ) {
+                        "AI service is temporarily unavailable because the Gemini usage limit has been reached. Please try again later."
+                    } else {
+                        msg
+                    }
+                } else {
+                    "AI service error (${e.code()}). Please try again later."
+                }
             } else {
-                "Server returned error code ${e.code()}."
+                "AI service error (${e.code()}). Please try again later."
             }
         } catch (_: Exception) {
-            "Server error (${e.code()}). Please check your connection."
+            "AI service error (${e.code()}). Please try again later."
         }
     }
 }
