@@ -177,10 +177,17 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = AgriTextPrimary,
+                        unfocusedTextColor = AgriTextPrimary,
+                        cursorColor = AgriPrimaryDark,
                         focusedBorderColor = AgriPrimary,
                         unfocusedBorderColor = AgriBorder,
                         focusedContainerColor = AgriBackground,
-                        unfocusedContainerColor = AgriBackground
+                        unfocusedContainerColor = AgriBackground,
+                        focusedLabelColor = AgriPrimaryDark,
+                        unfocusedLabelColor = AgriTextSecondary,
+                        focusedPlaceholderColor = AgriTextSecondary,
+                        unfocusedPlaceholderColor = AgriTextSecondary
                     ),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
@@ -220,10 +227,17 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = AgriTextPrimary,
+                        unfocusedTextColor = AgriTextPrimary,
+                        cursorColor = AgriPrimaryDark,
                         focusedBorderColor = AgriPrimary,
                         unfocusedBorderColor = AgriBorder,
                         focusedContainerColor = AgriBackground,
-                        unfocusedContainerColor = AgriBackground
+                        unfocusedContainerColor = AgriBackground,
+                        focusedLabelColor = AgriPrimaryDark,
+                        unfocusedLabelColor = AgriTextSecondary,
+                        focusedPlaceholderColor = AgriTextSecondary,
+                        unfocusedPlaceholderColor = AgriTextSecondary
                     ),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(

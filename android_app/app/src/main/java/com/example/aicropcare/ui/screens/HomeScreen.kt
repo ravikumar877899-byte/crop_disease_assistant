@@ -37,6 +37,7 @@ fun HomeScreen(
     onNavigateToScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToChatbot: () -> Unit,
+    onNavigateToTreatment: () -> Unit = onNavigateToScan,
     connectionViewModel: ConnectionViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -414,7 +415,7 @@ fun HomeScreen(
             description = "Identify possible crop diseases using AI.",
             icon = Icons.Default.Biotech,
             badgeText = "AI Model",
-            onClick = { showPlaceholderToast("Disease Detection") }
+            onClick = onNavigateToScan
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -422,10 +423,10 @@ fun HomeScreen(
         // Card 3: Treatment Advice
         FeatureCard(
             title = "Treatment Advice",
-            description = "Get simple treatment recommendations.",
+            description = "Get actionable treatment recommendations from AI diagnosis.",
             icon = Icons.Default.Medication,
             badgeText = "Guidance",
-            onClick = { showPlaceholderToast("Treatment Advice") }
+            onClick = onNavigateToTreatment
         )
 
         Spacer(modifier = Modifier.height(10.dp))

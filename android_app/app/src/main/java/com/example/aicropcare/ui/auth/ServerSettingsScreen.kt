@@ -94,6 +94,15 @@ fun ServerSettingsScreen(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = AgriTextPrimary,
+                        unfocusedTextColor = AgriTextPrimary,
+                        cursorColor = AgriPrimaryDark,
+                        focusedBorderColor = AgriPrimary,
+                        unfocusedBorderColor = AgriBorder,
+                        focusedContainerColor = AgriBackground,
+                        unfocusedContainerColor = AgriBackground
+                    ),
                     singleLine = true
                 )
 

@@ -285,7 +285,14 @@ fun AppNavigation() {
                             Screen.Home -> HomeScreen(
                                 onNavigateToScan = { currentScreen = Screen.Scan },
                                 onNavigateToHistory = { currentScreen = Screen.History },
-                                onNavigateToChatbot = { currentScreen = Screen.Chatbot }
+                                onNavigateToChatbot = { currentScreen = Screen.Chatbot },
+                                onNavigateToTreatment = {
+                                    if (activeAnalysisResult != null) {
+                                        currentScreen = Screen.AnalysisResult
+                                    } else {
+                                        currentScreen = Screen.Scan
+                                    }
+                                }
                             )
                             Screen.Scan -> ScanCropScreen(
                                 currentImageFile = currentImageFile,

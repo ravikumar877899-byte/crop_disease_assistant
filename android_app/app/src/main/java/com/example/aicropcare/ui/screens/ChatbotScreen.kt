@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,9 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aicropcare.data.preferences.SessionManager
+import com.example.aicropcare.network.ChatHistoryItem
+import com.example.aicropcare.repository.ChatbotRepository
 import com.example.aicropcare.theme.*
 import com.example.aicropcare.ui.components.ChatBubble
 import com.example.aicropcare.utils.Constants
@@ -30,12 +35,22 @@ import kotlinx.coroutines.launch
 data class ChatMessage(
     val id: Long = System.currentTimeMillis(),
     val text: String,
-    val isBot: Boolean
+    val isBot: Boolean,
+    val isError: Boolean = false
 )
 
 @Composable
-fun ChatbotScreen() {
+fun ChatbotScreen(
+    chatbotRepository: ChatbotRepository? = null
+) {
+    val context = LocalContext.current
+    val repository = remember {
+        chatbotRepository ?: ChatbotRepository(SessionManager(context))
+    }
+
     var inputText by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+
     val messages = remember {
         mutableStateListOf(
             ChatMessage(
@@ -49,21 +64,47 @@ fun ChatbotScreen() {
     val listState = rememberLazyListState()
 
     fun sendMessage(text: String) {
-        if (text.isBlank()) return
+        if (text.isBlank() || isLoading) return
         val userMsg = text.trim()
         messages.add(ChatMessage(text = userMsg, isBot = false))
         inputText = ""
+        isLoading = true
 
         coroutineScope.launch {
             listState.animateScrollToItem(messages.size - 1)
-            // Simulated response with required placeholder
-            kotlinx.coroutines.delay(400)
-            messages.add(
-                ChatMessage(
-                    text = Constants.MSG_CHATBOT_FUTURE,
-                    isBot = true
+
+            // Prepare recent conversation context for Gemini AI
+            val historyList = messages
+                .filter { !it.isError && it.text != Constants.MSG_CHATBOT_INITIAL }
+                .takeLast(6)
+                .map { msg ->
+                    ChatHistoryItem(
+                        role = if (msg.isBot) "model" else "user",
+                        text = msg.text
+                    )
+                }
+
+            val result = repository.sendQuery(userMsg, historyList)
+
+            result.onSuccess { botAnswer ->
+                messages.add(
+                    ChatMessage(
+                        text = botAnswer,
+                        isBot = true
+                    )
                 )
-            )
+            }.onFailure { ex ->
+                val errorMsg = ex.localizedMessage ?: "Failed to get response from Krishi AI. Please check your internet connection."
+                messages.add(
+                    ChatMessage(
+                        text = "⚠️ $errorMsg",
+                        isBot = true,
+                        isError = true
+                    )
+                )
+            }
+
+            isLoading = false
             listState.animateScrollToItem(messages.size - 1)
         }
     }
@@ -72,7 +113,9 @@ fun ChatbotScreen() {
         "🌿 Tomato leaf yellowing",
         "🌾 Rice blast symptoms",
         "🐛 Natural pest control",
-        "💧 Irrigation schedule"
+        "💧 Irrigation schedule",
+        "🥔 Potato early blight",
+        "🌱 Organic fertilizer tips"
     )
 
     Column(
@@ -121,11 +164,11 @@ fun ChatbotScreen() {
                             modifier = Modifier
                                 .size(8.dp)
                                 .clip(CircleShape)
-                                .background(AgriSuccess)
+                                .background(if (isLoading) AgriSecondary else AgriSuccess)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Your crop care assistant",
+                            text = if (isLoading) "Krishi AI is thinking..." else "AI Agricultural Assistant Active",
                             style = MaterialTheme.typography.bodySmall,
                             color = AgriTextSecondary
                         )
@@ -136,13 +179,24 @@ fun ChatbotScreen() {
                     color = AgriPrimaryContainer,
                     shape = RoundedCornerShape(100.dp)
                 ) {
-                    Text(
-                        text = "Phase 2 UI",
+                    Row(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = AgriPrimaryDark
-                    )
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            tint = AgriPrimaryDark,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = "Gemini AI",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriPrimaryDark
+                        )
+                    }
                 }
             }
         }
@@ -162,6 +216,41 @@ fun ChatbotScreen() {
                     isBot = message.isBot
                 )
             }
+
+            if (isLoading) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = AgriPrimaryContainer.copy(alpha = 0.5f),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(14.dp),
+                                    strokeWidth = 2.dp,
+                                    color = AgriPrimaryDark
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Krishi AI is answering...",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = AgriPrimaryDark,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // Quick Suggestion Chips
@@ -177,7 +266,7 @@ fun ChatbotScreen() {
                     modifier = Modifier
                         .clip(RoundedCornerShape(100.dp))
                         .border(1.dp, AgriBorder, RoundedCornerShape(100.dp))
-                        .clickable { sendMessage(chipText) },
+                        .clickable(enabled = !isLoading) { sendMessage(chipText) },
                     color = AgriPrimaryContainer
                 ) {
                     Text(
@@ -218,28 +307,34 @@ fun ChatbotScreen() {
                         .heightIn(min = 50.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = AgriTextPrimary,
+                        unfocusedTextColor = AgriTextPrimary,
+                        cursorColor = AgriPrimaryDark,
                         focusedBorderColor = AgriPrimary,
                         unfocusedBorderColor = AgriBorder,
                         focusedContainerColor = AgriBackground,
-                        unfocusedContainerColor = AgriBackground
+                        unfocusedContainerColor = AgriBackground,
+                        focusedPlaceholderColor = AgriTextSecondary,
+                        unfocusedPlaceholderColor = AgriTextSecondary
                     ),
-                    singleLine = true
+                    singleLine = true,
+                    enabled = !isLoading
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
                 IconButton(
                     onClick = { sendMessage(inputText) },
-                    enabled = inputText.isNotBlank(),
+                    enabled = inputText.isNotBlank() && !isLoading,
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(if (inputText.isNotBlank()) AgriPrimary else AgriDivider)
+                        .background(if (inputText.isNotBlank() && !isLoading) AgriPrimary else AgriDivider)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
-                        tint = if (inputText.isNotBlank()) Color.White else AgriTextSecondary
+                        tint = if (inputText.isNotBlank() && !isLoading) Color.White else AgriTextSecondary
                     )
                 }
             }

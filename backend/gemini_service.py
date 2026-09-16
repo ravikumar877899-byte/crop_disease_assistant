@@ -41,28 +41,15 @@ CANDIDATE_MODELS = [
 ]
 
 def _init_gemini_client(key_index: int) -> Tuple[bool, Optional[Any], Optional[str]]:
-    """Initialize genai with the specified key index and locate a working vision model."""
+    """Initialize genai with the specified key index and locate a working model."""
     if not GEMINI_KEYS or key_index >= len(GEMINI_KEYS):
         return False, None, None
-        
+
     try:
         api_key = GEMINI_KEYS[key_index]
         genai.configure(api_key=api_key)
-        
-        # Discover supported models
-        try:
-            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        except Exception:
-            available_models = []
 
-        # 1. Match prioritized candidate models
-        for cand in CANDIDATE_MODELS:
-            for avail in available_models:
-                if cand in avail:
-                    model = genai.GenerativeModel(avail)
-                    return True, model, avail
-                    
-        # 2. Try candidate models directly
+        # Directly instantiate prioritized candidate models
         for cand in CANDIDATE_MODELS:
             try:
                 model = genai.GenerativeModel(cand)
@@ -70,14 +57,10 @@ def _init_gemini_client(key_index: int) -> Tuple[bool, Optional[Any], Optional[s
             except Exception:
                 continue
 
-        # 3. Fallback to first available model
-        if available_models:
-            model = genai.GenerativeModel(available_models[0])
-            return True, model, available_models[0]
-
         return False, None, None
     except Exception:
         return False, None, None
+
 
 def configure_service() -> bool:
     """Configures the Gemini Vision AI service with the first available key."""
@@ -228,4 +211,88 @@ def analyze_crop_leaf(image_path: str) -> Dict[str, Any]:
         "status": "error",
         "message": f"Gemini Vision AI service unavailable: {last_error or 'Could not process image.'}",
         "is_clear": False
+    }
+
+
+def chat_with_krishi_ai(message: str, history: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
+    """
+    Agricultural chatbot assistant powered by Gemini.
+    Provides expert agricultural, plant pathology, and crop management guidance.
+    Performs key rotation across configured keys if quota or transient errors occur.
+    """
+    global _current_key_idx, _configured_model, _configured_model_name
+
+    if not message or not message.strip():
+        return {
+            "status": "error",
+            "message": "Message cannot be empty."
+        }
+
+    if not GEMINI_KEYS:
+        return {
+            "status": "error",
+            "message": "Gemini API key is not configured in backend environment."
+        }
+
+    clean_message = message.strip()
+
+    system_prompt = (
+        "You are 'Krishi AI', an expert agricultural consultant and AI crop care assistant. "
+        "Your mission is to help farmers, gardeners, and agronomists with crop health, disease management, "
+        "pest control, irrigation, fertilizers, soil health, and best farming practices.\n\n"
+        "Guidelines:\n"
+        "- Provide practical, farmer-friendly, actionable advice with clear steps or bullet points where appropriate.\n"
+        "- Support English as well as Tamil or Tamil-English (Tanglish) questions when the user asks in those languages.\n"
+        "- Be concise, warm, professional, and easy to understand (keep responses under 250-300 words).\n"
+        "- Do not pretend to be a physical human agricultural officer.\n"
+        "- If severe crop damage is described or symptoms are ambiguous, encourage consulting a local agricultural extension officer or certified agronomist.\n"
+        "- Never recommend dangerous chemicals or unverified toxic mixtures without standard agricultural safety precautions."
+    )
+
+    prompt_parts = [system_prompt]
+    if history and isinstance(history, list):
+        prompt_parts.append("\nRecent conversation context:")
+        for turn in history[-6:]:  # Keep last few turns for context
+            role = str(turn.get("role", "user"))
+            text = str(turn.get("text", "") or turn.get("content", "")).strip()
+            if text:
+                prompt_parts.append(f"{role.capitalize()}: {text}")
+
+    prompt_parts.append(f"\nFarmer's Question: {clean_message}\nKrishi AI Answer:")
+    final_prompt = "\n".join(prompt_parts)
+
+    num_keys = len(GEMINI_KEYS)
+    last_error = ""
+
+    for attempt in range(num_keys):
+        idx = (_current_key_idx + attempt) % num_keys
+        ok, model, model_name = _init_gemini_client(idx)
+        if not ok or model is None:
+            continue
+
+        try:
+            response = model.generate_content(final_prompt)
+            if response and response.text:
+                answer = response.text.strip()
+                _current_key_idx = idx
+                _configured_model = model
+                _configured_model_name = model_name
+
+                return {
+                    "status": "success",
+                    "response": answer,
+                    "engine": f"Krishi AI ({model_name})"
+                }
+        except Exception as e:
+            err_msg = str(e)
+            last_error = err_msg
+            if "429" in err_msg or "ResourceExhausted" in err_msg:
+                time.sleep(1)
+                continue
+            else:
+                continue
+
+    return {
+        "status": "error",
+        "message": f"Krishi AI service temporarily unavailable: {last_error or 'Could not generate response.'}"
     }

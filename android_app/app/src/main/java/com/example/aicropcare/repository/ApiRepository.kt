@@ -11,8 +11,17 @@ class ApiRepository {
         try {
             val response = RetrofitClient.getApiService().checkHealth()
             Result.success(response)
+        } catch (_: java.net.UnknownHostException) {
+            Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))
+        } catch (_: java.net.SocketTimeoutException) {
+            Result.failure(Exception("Server connection timed out. Please check your internet connection and try again."))
         } catch (e: Exception) {
-            Result.failure(e)
+            val msg = e.localizedMessage ?: "Failed to connect to backend server."
+            if (msg.contains("Unable to resolve host", ignoreCase = true) || msg.contains("No address associated", ignoreCase = true)) {
+                Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))
+            } else {
+                Result.failure(Exception(msg))
+            }
         }
     }
 
@@ -20,8 +29,17 @@ class ApiRepository {
         try {
             val response = RetrofitClient.getApiService().testMobileConnection()
             Result.success(response)
+        } catch (_: java.net.UnknownHostException) {
+            Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))
+        } catch (_: java.net.SocketTimeoutException) {
+            Result.failure(Exception("Server connection timed out. Please check your internet connection and try again."))
         } catch (e: Exception) {
-            Result.failure(e)
+            val msg = e.localizedMessage ?: "Failed to connect to backend server."
+            if (msg.contains("Unable to resolve host", ignoreCase = true) || msg.contains("No address associated", ignoreCase = true)) {
+                Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))
+            } else {
+                Result.failure(Exception(msg))
+            }
         }
     }
 }

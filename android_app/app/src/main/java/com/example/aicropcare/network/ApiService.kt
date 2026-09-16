@@ -32,4 +32,11 @@ interface ApiService {
         @Part image: MultipartBody.Part,
         @Header("Authorization") token: String? = null
     ): PredictionResponse
+
+    // ---------------- Phase 9 Krishi AI Chatbot ----------------
+    @POST("api/chatbot")
+    suspend fun askChatbot(
+        @Body request: ChatRequest,
+        @Header("Authorization") token: String? = null
+    ): ChatResponse
 }

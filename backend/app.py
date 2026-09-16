@@ -248,6 +248,30 @@ def predict_crop_disease():
 
     return jsonify(result), 200
 
+# ----------------- PHASE 9 KRISHI AI CHATBOT ROUTES -----------------
+
+@app.route('/api/chatbot', methods=['POST'])
+@app.route('/api/ai/chat', methods=['POST'])
+def chatbot_query():
+    """
+    Krishi AI Agricultural Advisory Chatbot Endpoint.
+    Accepts JSON: {"message": "...", "history": [...]}
+    Returns: {"status": "success", "response": "..."}
+    """
+    data = request.get_json(silent=True) or {}
+    message = data.get('message', '').strip()
+    history = data.get('history', [])
+
+    if not message:
+        return jsonify({
+            "status": "error",
+            "message": "Message parameter is required."
+        }), 400
+
+    result = gemini_service.chat_with_krishi_ai(message, history)
+    status_code = 200 if result.get("status") == "success" else (502 if "unavailable" in result.get("message", "").lower() else 400)
+    return jsonify(result), status_code
+
 # ----------------- STATIC UPLOADS & FRONTEND ROUTES -----------------
 
 @app.route('/uploads/<path:filename>')
