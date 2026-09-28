@@ -241,7 +241,8 @@ def predict_crop_disease():
         }), 400
 
     # Execute Gemini Vision AI analysis
-    result = gemini_service.analyze_crop_leaf(saved_filepath)
+    language = request.args.get('language') or request.args.get('lang') or request.form.get('language') or request.form.get('lang') or 'en'
+    result = gemini_service.analyze_crop_leaf(saved_filepath, language=language)
 
     if result.get("status") == "error":
         if result.get("code") == "QUOTA_EXCEEDED" or "usage limit" in result.get("message", "").lower():
@@ -270,7 +271,8 @@ def chatbot_query():
             "message": "Message parameter is required."
         }), 400
 
-    result = gemini_service.chat_with_krishi_ai(message, history)
+    language = data.get('language') or request.args.get('language') or 'en'
+    result = gemini_service.chat_with_krishi_ai(message, history, language=language)
     if result.get("status") == "error":
         if result.get("code") == "QUOTA_EXCEEDED" or "usage limit" in result.get("message", "").lower():
             return jsonify(result), 429
@@ -293,7 +295,7 @@ def serve_frontend(filename):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print("=" * 60)
-    print("🌱 AI CROP CARE - Backend Server")
+    print("AI CROP CARE - Backend Server")
     print("AI Crop Disease Detection and Treatment Assistant")
     print(f"📍 Server URL:      http://127.0.0.1:{port}")
     print(f"📍 Health API:      http://127.0.0.1:{port}/api/health")
