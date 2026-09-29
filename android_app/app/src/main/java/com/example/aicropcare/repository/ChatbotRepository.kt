@@ -22,7 +22,8 @@ class ChatbotRepository(
         try {
             val token = sessionManager?.authToken
             val authHeader = if (!token.isNullOrBlank()) "Bearer $token" else null
-            val request = ChatRequest(message = message.trim(), history = history)
+            val language = sessionManager?.language ?: "en"
+            val request = ChatRequest(message = message.trim(), history = history, language = language)
             val response = RetrofitClient.getApiService().askChatbot(request, authHeader)
 
             if (response.status == "error" || response.response.isNullOrBlank()) {

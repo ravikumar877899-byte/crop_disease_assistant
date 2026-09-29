@@ -1,5 +1,7 @@
 package com.example.aicropcare.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,7 +76,7 @@ fun AgriTopBar(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.cd_back),
                         tint = Color.White
                     )
                 }
@@ -119,7 +121,7 @@ fun AgriTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Translate,
-                            contentDescription = "Language",
+                            contentDescription = stringResource(R.string.cd_language),
                             tint = Color.White,
                             modifier = Modifier.size(16.dp)
                         )
@@ -148,9 +150,9 @@ fun StatusBadge(
     val textColor = if (isHealthy) AgriHealthyGreen else AgriDangerRed
     val borderCol = if (isHealthy) AgriHealthyGreen.copy(alpha = 0.4f) else AgriDangerRed.copy(alpha = 0.4f)
     val text = if (isHealthy) {
-        if (isTamil) "ஆரோக்கியமான பயிர்" else "Healthy Crop"
+        stringResource(R.string.badge_healthy_crop)
     } else {
-        if (isTamil) "நோய் தாக்கியுள்ளது" else "Disease Detected"
+        stringResource(R.string.badge_disease_detected)
     }
 
     Surface(
@@ -218,7 +220,7 @@ fun MetricCircleBadge(
 @Composable
 fun LoadingDialog(
     title: String = "AI Diagnosis in Progress…",
-    subtitle: String = "Analyzing leaf pathology with AI model",
+    subtitle: String = stringResource(R.string.loading_ai_subtitle),
     onDismiss: () -> Unit = {}
 ) {
     Dialog(onDismissRequest = onDismiss) {

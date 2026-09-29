@@ -1,5 +1,7 @@
-package com.example.aicropcare.ui.screens
+﻿package com.example.aicropcare.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +39,9 @@ fun HomeScreen(
     onNavigateToScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToChatbot: () -> Unit,
+    onNavigateToWeather: () -> Unit = {},
+    onNavigateToProgress: () -> Unit = {},
+    onNavigateToReminders: () -> Unit = {},
     onNavigateToTreatment: () -> Unit = onNavigateToScan,
     connectionViewModel: ConnectionViewModel = viewModel()
 ) {
@@ -88,7 +93,7 @@ fun HomeScreen(
                             shape = RoundedCornerShape(100.dp)
                         ) {
                             Text(
-                                text = "🌱 AI CROP CARE",
+                                text = stringResource(R.string.home_product_name),
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
@@ -101,7 +106,7 @@ fun HomeScreen(
                             shape = RoundedCornerShape(100.dp)
                         ) {
                             Text(
-                                text = "Phase 3 API",
+                                text = stringResource(R.string.home_phase_3_api),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
@@ -113,7 +118,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
-                        text = "Welcome to AI Crop Care",
+                        text = stringResource(R.string.home_hero_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -122,37 +127,11 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
-                        text = "Detect crop diseases early and get treatment guidance using AI.",
+                        text = stringResource(R.string.home_hero_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color(0xFFE8F5E9),
                         lineHeight = 20.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    // Prominent "Scan Your Crop" Hero Button
-                    Button(
-                        onClick = onNavigateToScan,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AgriSecondary,
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CameraAlt,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Scan Your Crop Now",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
-                }
+                    )}
             }
         }
 
@@ -168,148 +147,152 @@ fun HomeScreen(
             shadowElevation = 1.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(CircleShape)
-                                .background(AgriPrimaryContainer),
-                            contentAlignment = Alignment.Center
+                // Row 1: Icon and Title
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(AgriPrimaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudSync,
+                            contentDescription = stringResource(R.string.home_server_card_title),
+                            tint = AgriPrimaryDark,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(R.string.home_server_card_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriPrimaryDark
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // Base URL
+                Text(
+                    text = stringResource(R.string.home_server_base_url, RetrofitClient.getBaseUrl()),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AgriTextSecondary,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Status Badge
+                when (val state = connectionState) {
+                    is ConnectionUiState.Loading -> {
+                        Surface(
+                            color = AgriSecondaryContainer,
+                            shape = RoundedCornerShape(100.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.CloudSync,
-                                contentDescription = "Server",
-                                tint = AgriPrimaryDark,
-                                modifier = Modifier.size(18.dp)
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(14.dp),
+                                    strokeWidth = 2.dp,
+                                    color = AgriSecondaryDark
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.home_server_connecting),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = AgriSecondaryDark
+                                )
+                            }
+                        }
+                    }
+                    is ConnectionUiState.Success -> {
+                        Surface(
+                            color = AgriSuccessContainer,
+                            shape = RoundedCornerShape(100.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_server_connected),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = AgriSuccess
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
+                    }
+                    is ConnectionUiState.Error -> {
+                        Surface(
+                            color = AgriDangerContainer,
+                            shape = RoundedCornerShape(100.dp)
+                        ) {
                             Text(
-                                text = "AI Crop Care Server",
-                                style = MaterialTheme.typography.titleSmall,
+                                text = stringResource(R.string.home_server_offline),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = AgriPrimaryDark
+                                color = AgriDanger
                             )
+                        }
+                    }
+                    ConnectionUiState.Idle -> {
+                        Surface(
+                            color = AgriSurfaceVariant,
+                            shape = RoundedCornerShape(100.dp)
+                        ) {
                             Text(
-                                text = "Base URL: ${RetrofitClient.getBaseUrl()}",
-                                style = MaterialTheme.typography.labelSmall,
+                                text = stringResource(R.string.home_server_idle),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                style = MaterialTheme.typography.labelMedium,
                                 color = AgriTextSecondary
                             )
                         }
                     }
-
-                    // Status Badge
-                    when (val state = connectionState) {
-                        is ConnectionUiState.Loading -> {
-                            Surface(
-                                color = AgriSecondaryContainer,
-                                shape = RoundedCornerShape(100.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(12.dp),
-                                        strokeWidth = 2.dp,
-                                        color = AgriSecondaryDark
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "Connecting...",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = AgriSecondaryDark
-                                    )
-                                }
-                            }
-                        }
-                        is ConnectionUiState.Success -> {
-                            Surface(
-                                color = AgriSuccessContainer,
-                                shape = RoundedCornerShape(100.dp)
-                            ) {
-                                Text(
-                                    text = "Backend Connected ✓",
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = AgriSuccess
-                                )
-                            }
-                        }
-                        is ConnectionUiState.Error -> {
-                            Surface(
-                                color = AgriDangerContainer,
-                                shape = RoundedCornerShape(100.dp)
-                            ) {
-                                Text(
-                                    text = "Backend Offline",
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = AgriDanger
-                                )
-                            }
-                        }
-                        ConnectionUiState.Idle -> {
-                            Surface(
-                                color = AgriSurfaceVariant,
-                                shape = RoundedCornerShape(100.dp)
-                            ) {
-                                Text(
-                                    text = "Idle",
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = AgriTextSecondary
-                                )
-                            }
-                        }
-                    }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Connection Message Details
                 when (val state = connectionState) {
                     is ConnectionUiState.Success -> {
                         Text(
-                            text = "Server Response: \"${state.message}\" (at ${state.timestamp})",
+                            text = stringResource(R.string.home_server_response_format, state.message, state.timestamp),
                             style = MaterialTheme.typography.bodySmall,
                             color = AgriSuccess,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                     is ConnectionUiState.Error -> {
                         Text(
                             text = state.errorMessage,
                             style = MaterialTheme.typography.bodySmall,
-                            color = AgriDanger
+                            color = AgriDanger,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                     is ConnectionUiState.Loading -> {
                         Text(
-                            text = "Checking connection with Flask backend API...",
+                            text = stringResource(R.string.home_server_checking),
                             style = MaterialTheme.typography.bodySmall,
-                            color = AgriTextSecondary
+                            color = AgriTextSecondary,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                     ConnectionUiState.Idle -> {
                         Text(
-                            text = "Tap below to test communication with the Flask backend.",
+                            text = stringResource(R.string.home_server_tap_test),
                             style = MaterialTheme.typography.bodySmall,
-                            color = AgriTextSecondary
+                            color = AgriTextSecondary,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Test Server Connection Button
                 OutlinedButton(
@@ -318,7 +301,7 @@ fun HomeScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(44.dp),
+                        .height(48.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = AgriPrimaryDark
@@ -328,12 +311,12 @@ fun HomeScreen(
                     Icon(
                         imageVector = Icons.Default.Sync,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(18.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Test Server Connection",
-                        style = MaterialTheme.typography.labelMedium,
+                        text = stringResource(R.string.home_test_server),
+                        style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -376,14 +359,14 @@ fun HomeScreen(
 
                 Column {
                     Text(
-                        text = "Farmer Advisory Tip",
+                        text = stringResource(R.string.home_advisory_title),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = AgriSecondaryDark
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Scan leaf symptoms early in the day with clear sunlight for optimal disease detection accuracy.",
+                        text = stringResource(R.string.home_advisory_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF78350F)
                     )
@@ -394,16 +377,16 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Feature Services Section (5 Cards)
-        SectionTitle(title = "Crop Care Services", icon = Icons.Default.GridView)
+        SectionTitle(title = stringResource(R.string.home_crop_care_services), icon = Icons.Default.GridView)
 
         Spacer(modifier = Modifier.height(12.dp))
 
         // Card 1: Scan Crop
         FeatureCard(
-            title = "Scan Crop",
-            description = "Upload or capture a leaf image for AI analysis.",
+            title = stringResource(R.string.home_scan_crop),
+            description = stringResource(R.string.home_scan_desc),
             icon = Icons.Default.CameraAlt,
-            badgeText = "Ready",
+            badgeText = stringResource(R.string.badge_ready),
             onClick = onNavigateToScan
         )
 
@@ -411,10 +394,10 @@ fun HomeScreen(
 
         // Card 2: Disease Detection
         FeatureCard(
-            title = "Disease Detection",
-            description = "Identify possible crop diseases using AI.",
+            title = stringResource(R.string.home_disease_detection),
+            description = stringResource(R.string.home_disease_desc),
             icon = Icons.Default.Biotech,
-            badgeText = "AI Model",
+            badgeText = stringResource(R.string.badge_ai_model),
             onClick = onNavigateToScan
         )
 
@@ -422,10 +405,10 @@ fun HomeScreen(
 
         // Card 3: Treatment Advice
         FeatureCard(
-            title = "Treatment Advice",
-            description = "Get actionable treatment recommendations from AI diagnosis.",
+            title = stringResource(R.string.home_treatment_advice),
+            description = stringResource(R.string.home_treatment_desc),
             icon = Icons.Default.Medication,
-            badgeText = "Guidance",
+            badgeText = stringResource(R.string.badge_guidance),
             onClick = onNavigateToTreatment
         )
 
@@ -433,10 +416,10 @@ fun HomeScreen(
 
         // Card 4: Scan History
         FeatureCard(
-            title = "Scan History",
-            description = "View your previous crop scans.",
+            title = stringResource(R.string.home_scan_history),
+            description = stringResource(R.string.home_history_desc),
             icon = Icons.Default.History,
-            badgeText = "Records",
+            badgeText = stringResource(R.string.badge_records),
             onClick = onNavigateToHistory
         )
 
@@ -444,13 +427,46 @@ fun HomeScreen(
 
         // Card 5: Krishi AI
         FeatureCard(
-            title = "Krishi AI",
-            description = "Ask questions about crops and diseases.",
+            title = stringResource(R.string.home_krishi_ai),
+            description = stringResource(R.string.home_krishi_ai_desc),
             icon = Icons.Default.SmartToy,
-            badgeText = "Assistant",
+            badgeText = stringResource(R.string.badge_assistant),
             onClick = onNavigateToChatbot
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Card 6: Weather & Advisory
+        FeatureCard(
+            title = stringResource(R.string.home_service_weather_title),
+            description = stringResource(R.string.home_service_weather_desc),
+            icon = Icons.Default.Cloud,
+            onClick = onNavigateToWeather
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Card 7: Crop Health Progress
+        FeatureCard(
+            title = stringResource(R.string.home_service_crop_progress_title),
+            description = stringResource(R.string.home_service_crop_progress_desc),
+            icon = Icons.Default.TrendingUp,
+            onClick = onNavigateToProgress
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Card 8: Farming Reminders
+        FeatureCard(
+            title = stringResource(R.string.home_service_reminders_title),
+            description = stringResource(R.string.home_service_reminders_desc),
+            icon = Icons.Default.Notifications,
+            onClick = onNavigateToReminders
+        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
+
+
+
+

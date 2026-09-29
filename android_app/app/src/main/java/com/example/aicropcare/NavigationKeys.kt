@@ -1,8 +1,8 @@
-package com.example.aicropcare
+﻿package com.example.aicropcare
 
 import androidx.navigation3.runtime.NavKey
 import com.example.aicropcare.data.models.HistoryItem
-import com.example.aicropcare.data.models.PredictionResponse
+import com.example.aicropcare.network.PredictionResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -50,3 +50,16 @@ data object ChatbotNav : NavigationKey
 
 @Serializable
 data object ServerSettingsNav : NavigationKey
+
+@Serializable
+data object CropHealthProgressNav : NavigationKey
+
+@Serializable
+data object WeatherNav : NavigationKey
+
+@Serializable
+data object FarmingRemindersNav : NavigationKey
+
+@Serializable
+data object ProfileNav : NavigationKey
+

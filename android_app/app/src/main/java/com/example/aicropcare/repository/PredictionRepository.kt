@@ -28,8 +28,13 @@ class PredictionRepository(
 
             val token = sessionManager?.authToken
             val authHeader = if (!token.isNullOrBlank()) "Bearer $token" else null
+            val language = sessionManager?.language ?: "en"
 
-            val response = RetrofitClient.getApiService().predictCropDisease(filePart, authHeader)
+            val netStart = System.currentTimeMillis()
+            val response = RetrofitClient.getApiService().predictCropDisease(filePart, authHeader, language, language)
+            val netTimeMs = System.currentTimeMillis() - netStart
+            android.util.Log.d("AI_TIMING", "[AI TIMING] Upload/network: $netTimeMs ms (Payload: ${imageFile.length() / 1024} KB)")
+
 
             if (response.isError) {
                 Result.failure(Exception(response.message ?: "Analysis failed."))

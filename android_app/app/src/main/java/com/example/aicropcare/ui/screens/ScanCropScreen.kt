@@ -1,5 +1,7 @@
-package com.example.aicropcare.ui.screens
+﻿package com.example.aicropcare.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -152,12 +154,12 @@ fun ScanCropScreen(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = AgriPrimary)
                         ) {
-                            Text("Grant Permission", color = Color.White)
+                            Text(stringResource(R.string.weather_grant_permission), color = Color.White)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showPermissionRationale = false }) {
-                            Text("Cancel", color = AgriTextSecondary)
+                            Text(stringResource(R.string.cancel), color = AgriTextSecondary)
                         }
                     }
                 )
@@ -197,7 +199,7 @@ fun ScanCropScreen(
                                 shape = RoundedCornerShape(100.dp)
                             ) {
                                 Text(
-                                    text = "✓ Leaf Ready",
+                                    text = "âœ“ Leaf Ready",
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
@@ -392,13 +394,13 @@ fun ScanCropScreen(
 
             // Analyze Crop Button
             PrimaryButton(
-                text = if (isAnalyzing) "Analyzing Leaf..." else "🔍 Analyze Leaf with Gemini AI",
+                text = if (isAnalyzing) "Analyzing Leaf..." else "ðŸ” Analyze Leaf with Gemini AI",
                 onClick = {
                     val file = activeImageFile
                     if (file == null) {
                         Toast.makeText(context, "Please select or capture a crop leaf image first.", Toast.LENGTH_SHORT).show()
                     } else {
-                        scanViewModel.analyzeCrop(file) { response ->
+                        scanViewModel.analyzeCrop(context, file) { response ->
                             onAnalysisSuccess(response, file)
                         }
                     }
@@ -435,7 +437,7 @@ fun ScanCropScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• Use natural outdoor daylight without direct heavy glare.\n• Position the damaged or discolored leaf area inside the center of the frame.\n• Keep your phone steady when tapping the shutter button for sharp leaf vein details.",
+                        text = "â€¢ Use natural outdoor daylight without direct heavy glare.\nâ€¢ Position the damaged or discolored leaf area inside the center of the frame.\nâ€¢ Keep your phone steady when tapping the shutter button for sharp leaf vein details.",
                         style = MaterialTheme.typography.bodySmall,
                         color = AgriTextSecondary,
                         lineHeight = 20.sp
@@ -498,3 +500,4 @@ fun ScanCropScreen(
         }
     }
 }
+

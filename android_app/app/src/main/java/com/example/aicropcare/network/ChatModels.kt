@@ -15,7 +15,10 @@ data class ChatRequest(
     val message: String,
 
     @SerializedName("history")
-    val history: List<ChatHistoryItem>? = null
+    val history: List<ChatHistoryItem>? = null,
+
+    @SerializedName("language")
+    val language: String? = null
 )
 
 data class ChatResponse(

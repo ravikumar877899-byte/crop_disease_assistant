@@ -1,4 +1,4 @@
-package com.example.aicropcare.viewmodel
+﻿package com.example.aicropcare.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,45 +31,57 @@ class ConnectionViewModel(
 
     fun checkConnection() {
         viewModelScope.launch {
-            _uiState.value = ConnectionUiState.Loading
-            val result = repository.checkHealth()
-            val time = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+            try {
+                _uiState.value = ConnectionUiState.Loading
+                val result = repository.checkHealth()
+                val time = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
-            result.fold(
-                onSuccess = { response ->
-                    _uiState.value = ConnectionUiState.Success(
-                        message = response.message,
-                        timestamp = time
-                    )
-                },
-                onFailure = { error ->
-                    _uiState.value = ConnectionUiState.Error(
-                        errorMessage = "Unable to connect to AI Crop Care server (${error.localizedMessage ?: "Offline"})."
-                    )
-                }
-            )
+                result.fold(
+                    onSuccess = { response ->
+                        _uiState.value = ConnectionUiState.Success(
+                            message = response.message ?: "Connection successful.",
+                            timestamp = time
+                        )
+                    },
+                    onFailure = { error ->
+                        _uiState.value = ConnectionUiState.Error(
+                            errorMessage = "Unable to connect to AI Crop Care server (${error.localizedMessage ?: "Offline"})."
+                        )
+                    }
+                )
+            } catch (e: Throwable) {
+                _uiState.value = ConnectionUiState.Error(
+                    errorMessage = "Unexpected error checking connection (${e.localizedMessage ?: "Unknown"})."
+                )
+            }
         }
     }
 
     fun testMobileApi() {
         viewModelScope.launch {
-            _uiState.value = ConnectionUiState.Loading
-            val result = repository.testMobileConnection()
-            val time = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+            try {
+                _uiState.value = ConnectionUiState.Loading
+                val result = repository.testMobileConnection()
+                val time = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
-            result.fold(
-                onSuccess = { response ->
-                    _uiState.value = ConnectionUiState.Success(
-                        message = "${response.message} • ${response.app ?: "AI CROP CARE"}",
-                        timestamp = time
-                    )
-                },
-                onFailure = { error ->
-                    _uiState.value = ConnectionUiState.Error(
-                        errorMessage = "Unable to connect to AI Crop Care server: ${error.localizedMessage ?: "Offline"}"
-                    )
-                }
-            )
+                result.fold(
+                    onSuccess = { response ->
+                        _uiState.value = ConnectionUiState.Success(
+                            message = "${response.message ?: "Connected"} ? ${response.app ?: "AI CROP CARE"}",
+                            timestamp = time
+                        )
+                    },
+                    onFailure = { error ->
+                        _uiState.value = ConnectionUiState.Error(
+                            errorMessage = "Unable to connect to AI Crop Care server: ${error.localizedMessage ?: "Offline"}"
+                        )
+                    }
+                )
+            } catch (e: Throwable) {
+                _uiState.value = ConnectionUiState.Error(
+                    errorMessage = "Unexpected error testing connection (${e.localizedMessage ?: "Unknown"})."
+                )
+            }
         }
     }
 }

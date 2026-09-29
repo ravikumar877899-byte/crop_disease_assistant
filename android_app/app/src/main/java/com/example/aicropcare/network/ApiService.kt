@@ -30,7 +30,9 @@ interface ApiService {
     @POST("api/ai/predict")
     suspend fun predictCropDisease(
         @Part image: MultipartBody.Part,
-        @Header("Authorization") token: String? = null
+        @Header("Authorization") token: String? = null,
+        @Query("language") language: String? = null,
+        @Query("lang") lang: String? = null
     ): PredictionResponse
 
     // ---------------- Phase 9 Krishi AI Chatbot ----------------

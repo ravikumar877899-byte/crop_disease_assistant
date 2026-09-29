@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,7 +25,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import com.example.aicropcare.theme.*
+import com.example.aicropcare.utils.LocaleHelper
 
 /**
  * Top App Bar with Agriculture Branding
@@ -32,10 +38,14 @@ import com.example.aicropcare.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppHeader(
-    title: String = "AI CROP CARE",
-    subtitle: String? = "AI Crop Disease Detection & Treatment",
+    title: String = stringResource(R.string.app_name),
+    subtitle: String? = stringResource(R.string.ai_crop_disease_detection),
     showBackButton: Boolean = false,
     onBackClick: (() -> Unit)? = null,
+    showLanguageButton: Boolean = true,
+    onLanguageClick: (() -> Unit)? = null,
+    showProfileButton: Boolean = false,
+    onProfileClick: (() -> Unit)? = null,
     showLogoutButton: Boolean = false,
     onLogoutClick: (() -> Unit)? = null
 ) {
@@ -55,7 +65,7 @@ fun AppHeader(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.cd_back),
                         tint = AgriPrimaryDark
                     )
                 }
@@ -66,18 +76,15 @@ fun AppHeader(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        Brush.linearGradient(
-                            listOf(AgriPrimary, AgriPrimaryDark)
-                        )
-                    ),
+                    .background(AgriPrimaryContainer)
+                    .border(1.dp, AgriPrimary.copy(alpha = 0.25f), RoundedCornerShape(10.dp))
+                    .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Eco,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(22.dp)
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = com.example.aicropcare.R.drawable.ic_ai_crop_care_logo),
+                    contentDescription = stringResource(R.string.cd_ai_crop_care),
+                    modifier = Modifier.size(30.dp)
                 )
             }
 
@@ -115,17 +122,199 @@ fun AppHeader(
                 }
             }
 
-            if (showLogoutButton && onLogoutClick != null) {
-                IconButton(onClick = onLogoutClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Sign Out",
-                        tint = AgriTextSecondary
-                    )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (showLanguageButton && onLanguageClick != null) {
+                    IconButton(
+                        onClick = onLanguageClick,
+                        modifier = Modifier.size(38.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(AgriPrimaryContainer)
+                                .border(1.dp, AgriPrimary.copy(alpha = 0.3f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Language,
+                                contentDescription = stringResource(R.string.cd_language),
+                                tint = AgriPrimaryDark,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (showProfileButton && onProfileClick != null) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    IconButton(
+                        onClick = onProfileClick,
+                        modifier = Modifier.size(38.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(AgriPrimaryContainer)
+                                .border(1.dp, AgriPrimary.copy(alpha = 0.3f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = stringResource(R.string.cd_profile),
+                                tint = AgriPrimaryDark,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                    }
+                } else if (showLogoutButton && onLogoutClick != null) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    IconButton(onClick = onLogoutClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = stringResource(R.string.cd_sign_out),
+                            tint = AgriTextSecondary
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+/**
+ * Reusable Language Selection Dialog for Indian Languages
+ */
+@Composable
+fun LanguageSelectionDialog(
+    currentLanguage: String,
+    onDismissRequest: () -> Unit,
+    onLanguageSelected: (String) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurface,
+        shape = RoundedCornerShape(24.dp),
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(AgriPrimaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = null,
+                        tint = AgriPrimaryDark,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = stringResource(id = R.string.profile_language_select_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = AgriPrimaryDark
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 440.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                LocaleHelper.SUPPORTED_LANGUAGES.forEach { lang ->
+                    val isSelected = lang.code.equals(currentLanguage, ignoreCase = true)
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .border(
+                                width = if (isSelected) 1.5.dp else 1.dp,
+                                color = if (isSelected) AgriPrimary else AgriBorder,
+                                shape = RoundedCornerShape(14.dp)
+                            ),
+                        color = if (isSelected) AgriPrimaryContainer.copy(alpha = 0.75f) else AgriSurface,
+                        onClick = {
+                            onLanguageSelected(lang.code)
+                            onDismissRequest()
+                        }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = isSelected,
+                                onClick = {
+                                    onLanguageSelected(lang.code)
+                                    onDismissRequest()
+                                },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = AgriPrimaryDark,
+                                    unselectedColor = AgriTextSecondary
+                                )
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = lang.nativeName,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    color = if (isSelected) AgriPrimaryDark else AgriTextPrimary,
+                                    fontSize = 16.sp
+                                )
+                                if (lang.code != "en") {
+                                    Text(
+                                        text = lang.englishName,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (isSelected) AgriPrimaryDark.copy(alpha = 0.85f) else AgriTextSecondary,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
+                            if (isSelected) {
+                                Icon(
+                                    imageVector = Icons.Default.CheckCircle,
+                                    contentDescription = stringResource(R.string.cd_selected),
+                                    tint = AgriPrimaryDark,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onDismissRequest,
+                colors = ButtonDefaults.textButtonColors(contentColor = AgriPrimaryDark)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.cancel),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
+        }
+    )
 }
 
 /**
@@ -206,7 +395,7 @@ fun FeatureCard(
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Open",
+                contentDescription = stringResource(R.string.cd_open),
                 tint = AgriTextMuted,
                 modifier = Modifier.size(20.dp)
             )
@@ -354,7 +543,7 @@ fun ChatBubble(
             ) {
                 Icon(
                     imageVector = Icons.Default.SmartToy,
-                    contentDescription = "Krishi AI",
+                    contentDescription = stringResource(R.string.cd_krishi_ai),
                     tint = AgriPrimaryDark,
                     modifier = Modifier.size(20.dp)
                 )
@@ -393,7 +582,7 @@ fun ChatBubble(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Farmer",
+                    contentDescription = stringResource(R.string.cd_farmer),
                     tint = AgriSecondaryDark,
                     modifier = Modifier.size(20.dp)
                 )

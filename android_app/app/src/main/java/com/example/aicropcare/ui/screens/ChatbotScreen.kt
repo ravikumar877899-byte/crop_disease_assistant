@@ -18,6 +18,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -144,7 +146,7 @@ fun ChatbotScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.SmartToy,
-                        contentDescription = "Krishi AI",
+                        contentDescription = stringResource(R.string.home_krishi_ai),
                         tint = AgriPrimaryDark,
                         modifier = Modifier.size(24.dp)
                     )
@@ -154,7 +156,7 @@ fun ChatbotScreen(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Krishi AI",
+                        text = stringResource(R.string.home_krishi_ai),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = AgriPrimaryDark
@@ -191,7 +193,7 @@ fun ChatbotScreen(
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            text = "Gemini AI",
+                            text = stringResource(R.string.ai_model_name),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = AgriPrimaryDark
@@ -241,7 +243,7 @@ fun ChatbotScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Krishi AI is answering...",
+                                    text = stringResource(R.string.chatbot_answering),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = AgriPrimaryDark,
                                     fontWeight = FontWeight.Medium
@@ -297,7 +299,7 @@ fun ChatbotScreen(
                     onValueChange = { inputText = it },
                     placeholder = {
                         Text(
-                            text = "Ask a question about your crops...",
+                            text = stringResource(R.string.chatbot_hint),
                             style = MaterialTheme.typography.bodySmall,
                             color = AgriTextSecondary
                         )

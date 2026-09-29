@@ -1,4 +1,4 @@
-package com.example.aicropcare.repository
+﻿package com.example.aicropcare.repository
 
 import com.example.aicropcare.network.ApiResponse
 import com.example.aicropcare.network.RetrofitClient
@@ -15,7 +15,7 @@ class ApiRepository {
             Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))
         } catch (_: java.net.SocketTimeoutException) {
             Result.failure(Exception("Server connection timed out. Please check your internet connection and try again."))
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             val msg = e.localizedMessage ?: "Failed to connect to backend server."
             if (msg.contains("Unable to resolve host", ignoreCase = true) || msg.contains("No address associated", ignoreCase = true)) {
                 Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))
@@ -33,7 +33,7 @@ class ApiRepository {
             Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))
         } catch (_: java.net.SocketTimeoutException) {
             Result.failure(Exception("Server connection timed out. Please check your internet connection and try again."))
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             val msg = e.localizedMessage ?: "Failed to connect to backend server."
             if (msg.contains("Unable to resolve host", ignoreCase = true) || msg.contains("No address associated", ignoreCase = true)) {
                 Result.failure(Exception("Internet connection unavailable. Please check your mobile data or Wi-Fi and try again."))

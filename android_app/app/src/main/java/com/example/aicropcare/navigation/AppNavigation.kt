@@ -1,6 +1,7 @@
-package com.example.aicropcare.navigation
+﻿package com.example.aicropcare.navigation
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -22,298 +23,371 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.aicropcare.data.preferences.SessionManager
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
+import com.example.aicropcare.*
 import com.example.aicropcare.network.PredictionResponse
+import com.example.aicropcare.data.preferences.SessionManager
 import com.example.aicropcare.repository.AuthRepository
 import com.example.aicropcare.repository.PredictionRepository
-import com.example.aicropcare.theme.*
+import com.example.aicropcare.ui.screens.LoginScreen
+import com.example.aicropcare.ui.screens.RegisterScreen
+import com.example.aicropcare.ui.screens.ChatbotScreen
 import com.example.aicropcare.ui.components.AppHeader
-import com.example.aicropcare.ui.screens.*
+import com.example.aicropcare.ui.screens.HistoryScreen
+import com.example.aicropcare.ui.screens.HomeScreen
+import com.example.aicropcare.ui.screens.AnalysisResultScreen
+import com.example.aicropcare.ui.screens.CameraCaptureScreen
+import com.example.aicropcare.ui.screens.CropHealthProgressScreen
+import com.example.aicropcare.ui.screens.DiseaseDetectionScreen
+import com.example.aicropcare.ui.screens.FarmingRemindersScreen
+import com.example.aicropcare.ui.screens.ProfileScreen
+import com.example.aicropcare.ui.screens.ScanCropScreen
+import com.example.aicropcare.ui.screens.SplashScreen
+import com.example.aicropcare.ui.screens.TreatmentAdviceScreen
+import com.example.aicropcare.ui.screens.WeatherScreen
+import com.example.aicropcare.ui.theme.AgriPrimaryContainer
+import com.example.aicropcare.ui.theme.AgriPrimaryDark
+import com.example.aicropcare.ui.theme.AgriSurface
+import com.example.aicropcare.ui.theme.AgriTextSecondary
 import com.example.aicropcare.viewmodel.AuthViewModel
+import com.example.aicropcare.viewmodel.ConnectionViewModel
 import com.example.aicropcare.viewmodel.ScanViewModel
+import com.example.aicropcare.viewmodel.WeatherViewModel
 import java.io.File
 
 data class BottomNavItem(
-    val screen: Screen,
+    val key: NavigationKey,
+    val label: String,
     val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val label: String
+    val unselectedIcon: ImageVector
 )
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    currentLanguage: String,
+    onLanguageChanged: (String) -> Unit
+) {
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
+    
+    // Properly instantiated ViewModels attached to the Activity scope (thanks to MainActivity base context override)
     val authRepository = remember { AuthRepository(sessionManager) }
     val authViewModel = remember { AuthViewModel(authRepository) }
+    val connectionViewModel = remember { ConnectionViewModel() }
+    
     val predictionRepository = remember { PredictionRepository(sessionManager) }
-    val scanViewModel = remember { ScanViewModel(predictionRepository) }
+    val historyRepository = remember { com.example.aicropcare.repository.HistoryRepository(context) }
+    val cropHealthProgressRepository = remember { com.example.aicropcare.repository.CropHealthProgressRepository(historyRepository) }
+    val scanViewModel = remember { ScanViewModel(predictionRepository, historyRepository) }
 
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
-    var showLogoutDialog by remember { mutableStateOf(false) }
-    var currentImageFile by remember { mutableStateOf<File?>(null) }
     var activeAnalysisResult by remember { mutableStateOf<PredictionResponse?>(null) }
+    var currentImageFile by remember { mutableStateOf<File?>(null) }
+
+    val backStack = rememberNavBackStack(SplashNav)
+
+    val currentKey = backStack.lastOrNull()
 
     val bottomNavItems = listOf(
-        BottomNavItem(
-            screen = Screen.Home,
-            selectedIcon = Icons.Filled.Home,
-            unselectedIcon = Icons.Outlined.Home,
-            label = "Home"
-        ),
-        BottomNavItem(
-            screen = Screen.Scan,
-            selectedIcon = Icons.Filled.CameraAlt,
-            unselectedIcon = Icons.Outlined.CameraAlt,
-            label = "Scan"
-        ),
-        BottomNavItem(
-            screen = Screen.History,
-            selectedIcon = Icons.Filled.History,
-            unselectedIcon = Icons.Outlined.History,
-            label = "History"
-        ),
-        BottomNavItem(
-            screen = Screen.Chatbot,
-            selectedIcon = Icons.Filled.SmartToy,
-            unselectedIcon = Icons.Outlined.SmartToy,
-            label = "Krishi AI"
-        )
+        BottomNavItem(HomeNav, stringResource(R.string.nav_home), Icons.Filled.Home, Icons.Outlined.Home),
+        BottomNavItem(ScanCropNav, stringResource(R.string.nav_scan), Icons.Filled.CameraAlt, Icons.Outlined.CameraAlt),
+        BottomNavItem(HistoryNav, stringResource(R.string.nav_history), Icons.Filled.History, Icons.Outlined.History),
+        BottomNavItem(ChatbotNav, stringResource(R.string.nav_krishi_ai), Icons.Filled.SmartToy, Icons.Outlined.SmartToy)
     )
 
-    // Back button handling
-    when (currentScreen) {
-        Screen.Register -> {
-            BackHandler {
-                currentScreen = Screen.Login
+    val showBottomBar = currentKey is ScanCropNav || currentKey is HistoryNav || currentKey is ChatbotNav
+    val showHeader = currentKey is HomeNav || currentKey is ScanCropNav || currentKey is HistoryNav || currentKey is ChatbotNav
+
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
+
+    val handleLanguageChange: (String) -> Unit = { lang ->
+        onLanguageChanged(lang)
+        showLanguageDialog = false
+        if (activeAnalysisResult != null && currentImageFile != null) {
+            scanViewModel.analyzeCrop(context, currentImageFile!!) { response ->
+                activeAnalysisResult = response
             }
         }
-        Screen.CameraCapture -> {
-            BackHandler {
-                currentScreen = Screen.Scan
-            }
-        }
-        Screen.AnalysisResult -> {
-            BackHandler {
-                currentScreen = Screen.Scan
-            }
-        }
-        Screen.Scan, Screen.History, Screen.Chatbot -> {
-            BackHandler {
-                currentScreen = Screen.Home
-            }
-        }
-        else -> {}
     }
 
-    // Logout Confirmation Dialog
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = {
-                Text(
-                    text = "Sign Out",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = AgriPrimaryDark
-                )
-            },
-            text = {
-                Text(
-                    text = "Are you sure you want to sign out of AI Crop Care?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AgriTextPrimary
-                )
-            },
+            title = { Text("Logout") },
+            text = { Text("Are you sure you want to sign out?") },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showLogoutDialog = false
                         authViewModel.logout {
-                            currentImageFile = null
-                            activeAnalysisResult = null
-                            scanViewModel.resetState()
-                            currentScreen = Screen.Login
+                            backStack.clear()
+                            backStack.add(LoginNav)
                         }
                     }
                 ) {
-                    Text(
-                        text = "Sign Out",
-                        color = AgriDanger,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Logout", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Cancel", color = AgriTextSecondary)
+                    Text("Cancel")
                 }
             }
         )
     }
 
-    // Screen Switching
-    when (currentScreen) {
-        Screen.Splash -> {
-            SplashScreen(
-                onNavigateToHome = {
-                    currentScreen = Screen.Home
-                },
-                onNavigateToLogin = {
-                    currentScreen = Screen.Login
-                }
-            )
-        }
+    if (showLanguageDialog) {
+        com.example.aicropcare.ui.components.LanguageSelectionDialog(
+            currentLanguage = currentLanguage,
+            onDismissRequest = { showLanguageDialog = false },
+            onLanguageSelected = handleLanguageChange
+        )
+    }
 
-        Screen.Login -> {
-            LoginScreen(
-                authViewModel = authViewModel,
-                onNavigateToRegister = {
-                    currentScreen = Screen.Register
-                },
-                onLoginSuccess = {
-                    currentScreen = Screen.Home
-                }
-            )
-        }
-
-        Screen.Register -> {
-            RegisterScreen(
-                authViewModel = authViewModel,
-                onNavigateToLogin = {
-                    currentScreen = Screen.Login
-                },
-                onRegisterSuccess = {
-                    currentScreen = Screen.Login
-                }
-            )
-        }
-
-        Screen.CameraCapture -> {
-            CameraCaptureScreen(
-                onImageCaptured = { file ->
-                    currentImageFile = file
-                    scanViewModel.resetState()
-                    currentScreen = Screen.Scan
-                },
-                onClose = {
-                    currentScreen = Screen.Scan
-                }
-            )
-        }
-
-        Screen.AnalysisResult -> {
-            activeAnalysisResult?.let { result ->
-                AnalysisResultScreen(
-                    result = result,
-                    imageFile = currentImageFile,
-                    onScanAnother = {
-                        scanViewModel.resetState()
-                        currentScreen = Screen.Scan
+    Scaffold(
+        topBar = {
+            if (showHeader) {
+                AppHeader(
+                    title = "AI CROP CARE",
+                    subtitle = stringResource(R.string.ai_crop_disease_detection),
+                    showBackButton = currentKey !is HomeNav,
+                    onBackClick = { 
+                        backStack.clear()
+                        backStack.add(HomeNav)
                     },
-                    onNavigateToChatbot = {
-                        currentScreen = Screen.Chatbot
-                    },
-                    onBack = {
-                        currentScreen = Screen.Scan
-                    }
+                    showLogoutButton = true,
+                    onLogoutClick = { showLogoutDialog = true },
+                    onLanguageClick = { showLanguageDialog = true },
+                    onProfileClick = { backStack.add(ProfileNav) }
                 )
-            } ?: run {
-                // If no result is loaded, return to scan
-                LaunchedEffect(Unit) {
-                    currentScreen = Screen.Scan
+            }
+        },
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = AgriSurface,
+                    contentColor = AgriPrimaryDark,
+                    tonalElevation = 8.dp
+                ) {
+                    bottomNavItems.forEach { item ->
+                        val isSelected = currentKey == item.key
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = { 
+                                if (!isSelected) {
+                                    backStack.clear()
+                                    backStack.add(item.key)
+                                }
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                    contentDescription = item.label,
+                                    tint = if (isSelected) AgriPrimaryDark else AgriTextSecondary
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = item.label,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) AgriPrimaryDark else AgriTextSecondary
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                indicatorColor = AgriPrimaryContainer
+                            )
+                        )
+                    }
                 }
             }
         }
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            NavDisplay(
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
+                entryProvider = entryProvider {
+                    entry<SplashNav> {
+                        SplashScreen(
+                            onNavigateToHome = {
+                                backStack.clear()
+                                backStack.add(HomeNav)
+                            },
+                            onNavigateToLogin = {
+                                backStack.clear()
+                                backStack.add(LoginNav)
+                            }
+                        )
+                    }
 
-        Screen.Home, Screen.Scan, Screen.History, Screen.Chatbot -> {
-            Scaffold(
-                topBar = {
-                    AppHeader(
-                        title = "AI CROP CARE",
-                        subtitle = "AI Crop Disease Detection & Treatment",
-                        showBackButton = currentScreen != Screen.Home,
-                        onBackClick = { currentScreen = Screen.Home },
-                        showLogoutButton = true,
-                        onLogoutClick = { showLogoutDialog = true }
-                    )
-                },
-                bottomBar = {
-                    NavigationBar(
-                        containerColor = AgriSurface,
-                        contentColor = AgriPrimaryDark,
-                        tonalElevation = 8.dp
-                    ) {
-                        bottomNavItems.forEach { item ->
-                            val isSelected = currentScreen == item.screen
-                            NavigationBarItem(
-                                selected = isSelected,
-                                onClick = { currentScreen = item.screen },
-                                icon = {
-                                    Icon(
-                                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                        contentDescription = item.label,
-                                        tint = if (isSelected) AgriPrimaryDark else AgriTextSecondary
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        text = item.label,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isSelected) AgriPrimaryDark else AgriTextSecondary
-                                    )
-                                },
-                                colors = NavigationBarItemDefaults.colors(
-                                    indicatorColor = AgriPrimaryContainer
-                                )
-                            )
-                        }
+                    entry<LoginNav> {
+                        LoginScreen(
+                            authViewModel = authViewModel,
+                            onNavigateToRegister = { backStack.add(RegisterNav) },
+                            onLoginSuccess = {
+                                backStack.clear()
+                                backStack.add(HomeNav)
+                            }
+                        )
+                    }
+
+                    entry<RegisterNav> {
+                        RegisterScreen(
+                            authViewModel = authViewModel,
+                            onNavigateToLogin = { backStack.removeLastOrNull() },
+                            onRegisterSuccess = {
+                                backStack.removeLastOrNull()
+                            }
+                        )
+                    }
+
+                    entry<HomeNav> {
+                        HomeScreen(
+                            onNavigateToScan = { backStack.add(ScanCropNav) },
+                            onNavigateToHistory = { backStack.add(HistoryNav) },
+                            onNavigateToChatbot = { backStack.add(ChatbotNav) },
+                            onNavigateToWeather = { backStack.add(WeatherNav) },
+                            onNavigateToProgress = { backStack.add(CropHealthProgressNav) },
+                            onNavigateToReminders = { backStack.add(FarmingRemindersNav) },
+                            onNavigateToTreatment = {
+                                if (activeAnalysisResult != null) {
+                                    backStack.add(TreatmentNav(activeAnalysisResult!!))
+                                } else {
+                                    backStack.add(ScanCropNav)
+                                }
+                            },
+                            connectionViewModel = connectionViewModel,
+                            
+                        )
+                    }
+
+                    entry<ScanCropNav> {
+                        ScanCropScreen(
+                            currentImageFile = currentImageFile,
+                            scanViewModel = scanViewModel,
+                            onOpenCamera = { backStack.add(UploadImageNav) },
+                            onImageSelected = { file -> currentImageFile = file },
+                            onAnalysisSuccess = { response, file ->
+                                activeAnalysisResult = response
+                                currentImageFile = file
+                                backStack.add(AnalysisResultNav(response, file?.absolutePath))
+                            }
+                        )
+                    }
+
+                    entry<UploadImageNav> {
+                        CameraCaptureScreen(
+                            onImageCaptured = { file ->
+                                currentImageFile = file
+                                scanViewModel.resetState()
+                                backStack.removeLastOrNull()
+                            },
+                            onClose = { backStack.removeLastOrNull() }
+                        )
+                    }
+
+                    entry<AnalysisResultNav> { key: AnalysisResultNav ->
+                        DiseaseDetectionScreen(
+                            result = key.result,
+                            onNavigateToTreatment = { backStack.add(TreatmentNav(key.result)) },
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+
+                    entry<TreatmentNav> { key: TreatmentNav ->
+                        TreatmentAdviceScreen(
+                            result = key.result,
+                            onBack = { backStack.removeLastOrNull() },
+                            onRescanCrop = { 
+                                backStack.clear()
+                                backStack.add(ScanCropNav) 
+                            }
+                        )
+                    }
+
+                    entry<HistoryNav> {
+                        HistoryScreen(
+                            historyRepository = historyRepository,
+                            onNavigateToScan = { 
+                                backStack.clear()
+                                backStack.add(ScanCropNav) 
+                            },
+                            onHistoryItemClick = { response, imagePath ->
+                                backStack.add(AnalysisResultNav(response, imagePath))
+                            }
+                        )
+                    }
+
+                    
+
+                    entry<ChatbotNav> {
+                        ChatbotScreen()
+                    }
+
+                    
+
+                    entry<CropHealthProgressNav> {
+                        CropHealthProgressScreen(
+                            repository = cropHealthProgressRepository,
+                            onBack = { backStack.removeLastOrNull() },
+                            onNavigateToScan = { 
+                                backStack.clear()
+                                backStack.add(ScanCropNav)
+                            }
+                        )
+                    }
+
+                    entry<WeatherNav> {
+                        WeatherScreen(
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+
+                    entry<FarmingRemindersNav> {
+                        FarmingRemindersScreen(
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+
+                    entry<ProfileNav> {
+                        ProfileScreen(
+                            sessionManager = sessionManager,
+                            authViewModel = authViewModel,
+                            currentLanguage = currentLanguage,
+                            onLanguageSelected = handleLanguageChange,
+                            onBack = { backStack.removeLastOrNull() },
+                            onLogoutSuccess = {
+                                backStack.clear()
+                                backStack.add(LoginNav)
+                            }
+                        )
                     }
                 }
-            ) { innerPadding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
-                    Crossfade(
-                        targetState = currentScreen,
-                        animationSpec = tween(250),
-                        label = "screen_transition"
-                    ) { screen ->
-                        when (screen) {
-                            Screen.Home -> HomeScreen(
-                                onNavigateToScan = { currentScreen = Screen.Scan },
-                                onNavigateToHistory = { currentScreen = Screen.History },
-                                onNavigateToChatbot = { currentScreen = Screen.Chatbot },
-                                onNavigateToTreatment = {
-                                    if (activeAnalysisResult != null) {
-                                        currentScreen = Screen.AnalysisResult
-                                    } else {
-                                        currentScreen = Screen.Scan
-                                    }
-                                }
-                            )
-                            Screen.Scan -> ScanCropScreen(
-                                currentImageFile = currentImageFile,
-                                scanViewModel = scanViewModel,
-                                onOpenCamera = { currentScreen = Screen.CameraCapture },
-                                onImageSelected = { file -> currentImageFile = file },
-                                onAnalysisSuccess = { response, file ->
-                                    activeAnalysisResult = response
-                                    currentImageFile = file
-                                    currentScreen = Screen.AnalysisResult
-                                }
-                            )
-                            Screen.History -> HistoryScreen(
-                                onNavigateToScan = { currentScreen = Screen.Scan }
-                            )
-                            Screen.Chatbot -> ChatbotScreen()
-                            else -> {}
-                        }
-                    }
-                }
-            }
+            )
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

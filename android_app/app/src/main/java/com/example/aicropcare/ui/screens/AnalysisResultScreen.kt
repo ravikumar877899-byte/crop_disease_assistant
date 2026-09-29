@@ -1,5 +1,7 @@
-package com.example.aicropcare.ui.screens
+﻿package com.example.aicropcare.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -36,7 +38,7 @@ fun AnalysisResultScreen(
     onBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val isHealthy = result.isHealthy
+    val isHealthy = (result.isHealthy == true)
     val isClear = result.isClear
 
     Scaffold(
@@ -122,7 +124,7 @@ fun AnalysisResultScreen(
             }
 
             // Image Clarity Warning Banner (if image is unclear or not a plant leaf)
-            if (!isClear) {
+            if (isClear == false) {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -376,7 +378,7 @@ fun AnalysisResultScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             PrimaryButton(
-                text = "🌱 Scan Another Crop",
+                text = "ðŸŒ± Scan Another Crop",
                 onClick = onScanAnother,
                 icon = Icons.Default.PhotoCamera
             )
@@ -407,3 +409,5 @@ fun AnalysisResultScreen(
         }
     }
 }
+
+

@@ -1,5 +1,7 @@
 package com.example.aicropcare.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -279,7 +281,7 @@ fun LoginScreen(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Signing in...", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.login_signing_in), fontWeight = FontWeight.Bold)
                     } else {
                         Icon(
                             imageVector = Icons.Default.Login,

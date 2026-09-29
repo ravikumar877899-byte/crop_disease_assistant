@@ -1,4 +1,4 @@
-package com.example.aicropcare.repository
+﻿package com.example.aicropcare.repository
 
 import com.example.aicropcare.data.preferences.SessionManager
 import com.example.aicropcare.network.*
@@ -28,7 +28,7 @@ class AuthRepository(
         } catch (e: HttpException) {
             val errorMsg = parseHttpError(e)
             Result.failure(Exception(errorMsg))
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.failure(Exception(e.localizedMessage ?: "Network error occurred."))
         }
     }
@@ -48,7 +48,7 @@ class AuthRepository(
         } catch (e: HttpException) {
             val errorMsg = parseHttpError(e)
             Result.failure(Exception(errorMsg))
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.failure(Exception(e.localizedMessage ?: "Network error occurred."))
         }
     }
@@ -60,7 +60,7 @@ class AuthRepository(
         } catch (e: HttpException) {
             val errorMsg = parseHttpError(e)
             Result.failure(Exception(errorMsg))
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.failure(Exception(e.localizedMessage ?: "Unable to verify session."))
         }
     }
@@ -71,7 +71,7 @@ class AuthRepository(
             if (!token.isNullOrBlank()) {
                 RetrofitClient.getApiService().logout("Bearer $token")
             }
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             // Logout locally even if network fails
         } finally {
             sessionManager?.clearSession()
@@ -84,11 +84,11 @@ class AuthRepository(
             val errorBody = e.response()?.errorBody()?.string()
             if (!errorBody.isNullOrBlank()) {
                 val parsed = gson.fromJson(errorBody, ApiResponse::class.java)
-                parsed.message
+                parsed.message ?: "Server returned error code ${e.code()}."
             } else {
                 "Server returned error code ${e.code()}."
             }
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             "Server returned error code ${e.code()}."
         }
     }

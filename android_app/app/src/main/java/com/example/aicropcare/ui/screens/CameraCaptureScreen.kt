@@ -1,5 +1,7 @@
 package com.example.aicropcare.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import android.content.Context
 import android.widget.Toast
 import androidx.camera.core.*
@@ -140,7 +142,7 @@ fun CameraCaptureScreen(
                 shape = RoundedCornerShape(100.dp)
             ) {
                 Text(
-                    text = "🌿 Align leaf within frame",
+                    text = stringResource(R.string.camera_align_leaf),
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White,

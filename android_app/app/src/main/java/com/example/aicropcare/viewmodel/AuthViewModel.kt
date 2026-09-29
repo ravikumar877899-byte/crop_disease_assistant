@@ -1,4 +1,4 @@
-package com.example.aicropcare.viewmodel
+﻿package com.example.aicropcare.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,22 +34,26 @@ class AuthViewModel(
         }
 
         viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
-            val result = authRepository.login(username.trim(), password)
-            result.fold(
-                onSuccess = { response ->
-                    _uiState.value = AuthUiState.Success(
-                        message = response.message,
-                        user = response.user
-                    )
-                    onSuccess()
-                },
-                onFailure = { error ->
-                    _uiState.value = AuthUiState.Error(
-                        error.message ?: "Invalid credentials. Please try again."
-                    )
-                }
-            )
+            try {
+                _uiState.value = AuthUiState.Loading
+                val result = authRepository.login(username.trim(), password)
+                result.fold(
+                    onSuccess = { response ->
+                        _uiState.value = AuthUiState.Success(
+                            message = response.message ?: "Login successful.",
+                            user = response.user
+                        )
+                        onSuccess()
+                    },
+                    onFailure = { error ->
+                        _uiState.value = AuthUiState.Error(
+                            error.message ?: "Invalid credentials. Please try again."
+                        )
+                    }
+                )
+            } catch (e: Throwable) {
+                _uiState.value = AuthUiState.Error("Unexpected error during login. Please try again.")
+            }
         }
     }
 
@@ -81,30 +85,39 @@ class AuthViewModel(
         }
 
         viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
-            val result = authRepository.register(username.trim(), email.trim(), password)
-            result.fold(
-                onSuccess = { response ->
-                    _uiState.value = AuthUiState.Success(
-                        message = response.message,
-                        user = response.user
-                    )
-                    onSuccess()
-                },
-                onFailure = { error ->
-                    _uiState.value = AuthUiState.Error(
-                        error.message ?: "Registration failed. Please try again."
-                    )
-                }
-            )
+            try {
+                _uiState.value = AuthUiState.Loading
+                val result = authRepository.register(username.trim(), email.trim(), password)
+                result.fold(
+                    onSuccess = { response ->
+                        _uiState.value = AuthUiState.Success(
+                            message = response.message ?: "Registration successful.",
+                            user = response.user
+                        )
+                        onSuccess()
+                    },
+                    onFailure = { error ->
+                        _uiState.value = AuthUiState.Error(
+                            error.message ?: "Registration failed. Please try again."
+                        )
+                    }
+                )
+            } catch (e: Throwable) {
+                _uiState.value = AuthUiState.Error("Unexpected error during registration.")
+            }
         }
     }
 
     fun logout(onLoggedOut: () -> Unit) {
         viewModelScope.launch {
-            authRepository.logout()
-            _uiState.value = AuthUiState.Idle
-            onLoggedOut()
+            try {
+                authRepository.logout()
+            } catch (e: Throwable) {
+                // Ignore logout network errors
+            } finally {
+                _uiState.value = AuthUiState.Idle
+                onLoggedOut()
+            }
         }
     }
 }

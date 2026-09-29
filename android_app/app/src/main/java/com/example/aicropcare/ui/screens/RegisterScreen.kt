@@ -1,5 +1,7 @@
 package com.example.aicropcare.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.example.aicropcare.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -366,7 +368,7 @@ fun RegisterScreen(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Creating Account...", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.register_creating), fontWeight = FontWeight.Bold)
                     } else {
                         Icon(
                             imageVector = Icons.Default.PersonAdd,
