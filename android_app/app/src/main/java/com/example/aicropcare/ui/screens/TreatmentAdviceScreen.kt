@@ -1,5 +1,12 @@
 package com.example.aicropcare.ui.screens
 
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.aicropcare.utils.TreatmentVoiceHelper
+import com.example.aicropcare.utils.LocaleHelper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -33,6 +40,62 @@ fun TreatmentAdviceScreen(
     onBack: () -> Unit,
     onRescanCrop: () -> Unit
 ) {
+    val context = LocalContext.current
+    val voiceHelper = remember { TreatmentVoiceHelper(context) }
+    val isSpeaking by voiceHelper.isSpeaking.collectAsState()
+    val ttsError by voiceHelper.error.collectAsState()
+    
+    DisposableEffect(Unit) {
+        onDispose {
+            voiceHelper.shutdown()
+        }
+    }
+    
+    val diseasePrefix = stringResource(R.string.title_disease_name)
+    val immediateActionPrefix = stringResource(R.string.result_immediate_action_title)
+    val managementPrefix = stringResource(R.string.treatment_cultural_mgmt_title)
+    val medicinePrefix = stringResource(R.string.treatment_medicine_guidance_title)
+    val weatherPrefix = stringResource(R.string.weather_precaution_title)
+    val avoidPrefix = stringResource(R.string.treatment_avoid_title)
+    val safetyPrefix = stringResource(R.string.treatment_safety_title)
+    
+    val fullSpeechText = remember(result, diseasePrefix, immediateActionPrefix, managementPrefix, medicinePrefix, weatherPrefix, avoidPrefix, safetyPrefix) {
+        buildString {
+            append("$diseasePrefix: ${result.displayDisease}. ")
+            
+            val plan = result.resolvedTreatmentPlan
+            if (!plan.immediateAction.isNullOrBlank()) {
+                append("$immediateActionPrefix: ${plan.immediateAction}. ")
+            }
+            
+            if (!plan.management.isNullOrEmpty()) {
+                append("$managementPrefix: ")
+                plan.management.forEach { append("$it. ") }
+            }
+            
+            if (!plan.medicineGuidance.isNullOrEmpty()) {
+                append("$medicinePrefix: ")
+                plan.medicineGuidance.forEach { med ->
+                    append("${med.activeIngredient ?: ""} for ${med.purpose ?: ""}. ")
+                }
+            }
+            
+            if (!plan.weatherPrecaution.isNullOrBlank()) {
+                append("$weatherPrefix: ${plan.weatherPrecaution}. ")
+            }
+            
+            if (!plan.avoid.isNullOrEmpty()) {
+                append("$avoidPrefix: ")
+                plan.avoid.forEach { append("$it. ") }
+            }
+            
+            if (!plan.safetyPrecautions.isNullOrEmpty()) {
+                append("$safetyPrefix: ")
+                plan.safetyPrecautions.forEach { append("$it. ") }
+            }
+        }
+    }
+
     val scrollState = rememberScrollState()
     val isHealthy = result.isHealthy
     val severity = result.parsedSeverity
@@ -79,6 +142,49 @@ fun TreatmentAdviceScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // TTS Voice Control
+            if (ttsError != null) {
+                Surface(
+                    color = AgriDangerContainer,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(id = if (ttsError == "voice_language_unavailable") R.string.voice_language_unavailable else R.string.voice_initialization_failed),
+                        color = AgriDanger,
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            } else {
+                OutlinedButton(
+                    onClick = {
+                        if (isSpeaking) {
+                            voiceHelper.stop()
+                        } else {
+                            val currentLang = java.util.Locale.getDefault().language
+                            voiceHelper.speak(fullSpeechText, currentLang)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = if (isSpeaking) AgriDanger else AgriPrimaryDark
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isSpeaking) AgriDanger else AgriPrimary)
+                ) {
+                    Icon(
+                        imageVector = if (isSpeaking) Icons.Default.Stop else Icons.Default.VolumeUp,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(id = if (isSpeaking) R.string.stop_treatment else R.string.listen_treatment),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
             // 1. SMART TREATMENT & MANAGEMENT PLAN (Category Badge, Objective, Immediate Action)
             Surface(
                 modifier = Modifier

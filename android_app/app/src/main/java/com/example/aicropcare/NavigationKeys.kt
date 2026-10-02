@@ -63,3 +63,6 @@ data object FarmingRemindersNav : NavigationKey
 @Serializable
 data object ProfileNav : NavigationKey
 
+
+@Serializable
+data object CropRecommendationNav : NavigationKey

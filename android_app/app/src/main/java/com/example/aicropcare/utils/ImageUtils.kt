@@ -27,8 +27,8 @@ object ImageUtils {
     fun optimizeImageForAnalysis(
         context: Context,
         inputFile: File,
-        maxDimension: Int = 1200,
-        quality: Int = 82
+        maxDimension: Int = 800,
+        quality: Int = 75
     ): File {
         val startTime = System.currentTimeMillis()
         val originalLength = inputFile.length()
@@ -43,7 +43,7 @@ object ImageUtils {
             val rawHeight = options.outHeight
 
             // If file is already small and bounded, return as is
-            if (rawWidth > 0 && rawHeight > 0 && rawWidth <= maxDimension && rawHeight <= maxDimension && originalLength < 350 * 1024) {
+            if (rawWidth > 0 && rawHeight > 0 && rawWidth <= maxDimension && rawHeight <= maxDimension && originalLength < 800 * 1024) {
                 val durMs = System.currentTimeMillis() - startTime
                 Log.d(TAG, "[AI TIMING] Image preprocessing: $durMs ms (Already optimal ${rawWidth}x${rawHeight}, ${originalLength / 1024} KB)")
                 return inputFile

@@ -40,6 +40,14 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
             if (dbReminder != null) {
                 if (!dbReminder.isCompleted) {
                     ReminderNotificationHelper.showReminderNotification(context, dbReminder)
+                    // Automatically mark as completed when the scheduled notification fires
+                    try {
+                        val updatedReminder = dbReminder.copy(isCompleted = true)
+                        dbHelper.updateReminder(updatedReminder)
+                        Log.d(TAG, "Successfully marked reminder $reminderId as completed.")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to update reminder status", e)
+                    }
                 } else {
                     Log.d(TAG, "Reminder $reminderId already completed, skipping notification.")
                 }

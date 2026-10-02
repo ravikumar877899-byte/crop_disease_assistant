@@ -43,6 +43,7 @@ fun HomeScreen(
     onNavigateToProgress: () -> Unit = {},
     onNavigateToReminders: () -> Unit = {},
     onNavigateToTreatment: () -> Unit = onNavigateToScan,
+    onNavigateToCropRecommendation: () -> Unit = {},
     connectionViewModel: ConnectionViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -462,6 +463,15 @@ fun HomeScreen(
             onClick = onNavigateToReminders
         )
         Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Card 9: Smart Crop Recommendation
+        FeatureCard(
+            title = stringResource(R.string.smart_crop_recommendation_title),
+            description = stringResource(R.string.loc_based_crop_advisor),
+            icon = Icons.Default.Map,
+            onClick = onNavigateToCropRecommendation
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
     }

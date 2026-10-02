@@ -1,15 +1,23 @@
 package com.example.aicropcare.utils
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
+import android.os.Looper
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
 import java.util.Locale
 
 data class UserLocation(
@@ -56,6 +64,84 @@ object LocationHelper {
         ) == PackageManager.PERMISSION_GRANTED
 
         return fineLocation || coarseLocation
+    }
+
+    @SuppressLint("MissingPermission")
+    suspend fun getFreshLocation(context: Context): UserLocation? = suspendCancellableCoroutine { continuation ->
+        if (!hasLocationPermission(context)) {
+            continuation.resume(null)
+            return@suspendCancellableCoroutine
+        }
+
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+        if (locationManager == null) {
+            continuation.resume(null)
+            return@suspendCancellableCoroutine
+        }
+
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+        if (!isGpsEnabled && !isNetworkEnabled) {
+            continuation.resume(null)
+            return@suspendCancellableCoroutine
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val provider = if (isGpsEnabled) LocationManager.GPS_PROVIDER else LocationManager.NETWORK_PROVIDER
+            try {
+                locationManager.getCurrentLocation(
+                    provider,
+                    null,
+                    ContextCompat.getMainExecutor(context)
+                ) { location ->
+                    if (location != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val cityName = getCityNameFromCoordinates(context, location.latitude, location.longitude)
+                            if (continuation.isActive) continuation.resume(UserLocation(location.latitude, location.longitude, cityName))
+                        }
+                    } else {
+                        if (continuation.isActive) continuation.resume(null)
+                    }
+                }
+            } catch (e: Exception) {
+                if (continuation.isActive) continuation.resume(null)
+            }
+        } else {
+            try {
+                val provider = if (isNetworkEnabled) LocationManager.NETWORK_PROVIDER else LocationManager.GPS_PROVIDER
+                val listener = object : LocationListener {
+                    override fun onLocationChanged(location: Location) {
+                        locationManager.removeUpdates(this)
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val cityName = getCityNameFromCoordinates(context, location.latitude, location.longitude)
+                            if (continuation.isActive) continuation.resume(UserLocation(location.latitude, location.longitude, cityName))
+                        }
+                    }
+                    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+                    override fun onProviderEnabled(provider: String) {}
+                    override fun onProviderDisabled(provider: String) {}
+                }
+                locationManager.requestSingleUpdate(provider, listener, Looper.getMainLooper())
+                
+                continuation.invokeOnCancellation {
+                    locationManager.removeUpdates(listener)
+                }
+            } catch (e: Exception) {
+                if (continuation.isActive) continuation.resume(null)
+            }
+        }
+    }
+    
+    suspend fun getBestLocation(context: Context): UserLocation? {
+        val fresh = getFreshLocation(context)
+        if (fresh != null) return fresh
+        return getLastKnownLocation(context)
+    }
+    
+    fun isLocationEnabled(context: Context): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return false
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
     @Suppress("DEPRECATION")

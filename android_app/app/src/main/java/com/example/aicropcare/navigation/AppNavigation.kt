@@ -47,6 +47,7 @@ import com.example.aicropcare.ui.screens.FarmingRemindersScreen
 import com.example.aicropcare.ui.screens.ProfileScreen
 import com.example.aicropcare.ui.screens.ScanCropScreen
 import com.example.aicropcare.ui.screens.SplashScreen
+import com.example.aicropcare.ui.screens.CropRecommendationScreen
 import com.example.aicropcare.ui.screens.TreatmentAdviceScreen
 import com.example.aicropcare.ui.screens.WeatherScreen
 import com.example.aicropcare.ui.theme.AgriPrimaryContainer
@@ -107,7 +108,8 @@ fun AppNavigation(
     val handleLanguageChange: (String) -> Unit = { lang ->
         onLanguageChanged(lang)
         showLanguageDialog = false
-        if (activeAnalysisResult != null && currentImageFile != null) {
+        val isViewingResult = currentKey is AnalysisResultNav || currentKey is TreatmentNav
+        if (isViewingResult && activeAnalysisResult != null && currentImageFile != null) {
             scanViewModel.analyzeCrop(context, currentImageFile!!) { response ->
                 activeAnalysisResult = response
             }
@@ -253,6 +255,7 @@ fun AppNavigation(
                             onNavigateToWeather = { backStack.add(WeatherNav) },
                             onNavigateToProgress = { backStack.add(CropHealthProgressNav) },
                             onNavigateToReminders = { backStack.add(FarmingRemindersNav) },
+                            onNavigateToCropRecommendation = { backStack.add(CropRecommendationNav) },
                             onNavigateToTreatment = {
                                 if (activeAnalysisResult != null) {
                                     backStack.add(TreatmentNav(activeAnalysisResult!!))
@@ -341,7 +344,13 @@ fun AppNavigation(
                         )
                     }
 
-                    entry<WeatherNav> {
+                    
+                    entry<CropRecommendationNav> {
+                        CropRecommendationScreen(
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+entry<WeatherNav> {
                         WeatherScreen(
                             onBack = { backStack.removeLastOrNull() }
                         )

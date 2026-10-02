@@ -47,21 +47,19 @@ class WeatherRepository(
                 val rainAmount = current?.rain ?: current?.precipitation ?: 0.0
                 val weatherCode = current?.weatherCode ?: 0
 
-                // Determine rain probability from daily max or current precipitation
-                val dailyRainProb = daily?.precipProbMax?.firstOrNull() ?: 0
-                val rainProbability = if (dailyRainProb > 0) {
-                    dailyRainProb
-                } else if (WeatherCodeMapper.isRainy(weatherCode)) {
-                    75
-                } else {
-                    (current?.precipitation?.let { if (it > 0.0) 80 else 0 }) ?: 0
+                val apiTimezone = body.timezone ?: TimeZone.getDefault().id
+                val sdfIso = SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.getDefault()).apply {
+                    timeZone = TimeZone.getTimeZone(apiTimezone)
                 }
+                val currentIsoHour = sdfIso.format(Date())
+                val currentHourIndex = hourly?.time?.indexOfFirst { it.startsWith(currentIsoHour) }?.takeIf { it >= 0 } ?: 0
+                val rainProbability = hourly?.precipProb?.getOrNull(currentHourIndex) ?: 0
 
                 val sunrise = formatTime(daily?.sunrise?.firstOrNull()) ?: "06:00 AM"
                 val sunset = formatTime(daily?.sunset?.firstOrNull()) ?: "06:30 PM"
 
                 // 1. Process 24-Hour Hourly Forecast
-                val hourlyList = extractHourlyForecast(hourly)
+                val hourlyList = extractHourlyForecast(hourly, apiTimezone)
 
                 // 2. Process 7-Day Daily Forecast
                 val dailyList = extractDailyForecast(daily, temperature)
@@ -72,9 +70,8 @@ class WeatherRepository(
                     currentHumidity = humidity,
                     currentWind = windSpeed,
                     currentGusts = windGusts,
-                    currentWeatherCode = weatherCode,
-                    dailyRainSum = daily?.precipSum?.firstOrNull() ?: 0.0,
-                    dailyRainProb = rainProbability
+                    currentRain = rainAmount,
+                    hourlyForecast = hourlyList
                 )
 
                 // 4. Generate Farm & Crop-Specific Advisory
@@ -96,7 +93,10 @@ class WeatherRepository(
                     weatherCode = weatherCode
                 )
 
-                val currentTimeFormatted = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+                val sdfTime = SimpleDateFormat("hh:mm a", Locale.getDefault()).apply {
+                    timeZone = TimeZone.getTimeZone(apiTimezone)
+                }
+                val currentTimeFormatted = sdfTime.format(Date())
 
                 val weatherData = WeatherData(
                     locationName = locationName,
@@ -157,11 +157,14 @@ class WeatherRepository(
         }
     }
 
-    private fun extractHourlyForecast(hourly: OpenMeteoHourly?): List<HourlyForecastItem> {
+    private fun extractHourlyForecast(hourly: OpenMeteoHourly?, apiTimezone: String): List<HourlyForecastItem> {
         if (hourly == null || hourly.time.isEmpty()) return emptyList()
 
         val list = mutableListOf<HourlyForecastItem>()
-        val currentIsoHour = SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.getDefault()).format(Date())
+        val sdfIso = SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone(apiTimezone)
+        }
+        val currentIsoHour = sdfIso.format(Date())
 
         // Find index corresponding to the current hour or default to 0
         var startIndex = hourly.time.indexOfFirst { it.startsWith(currentIsoHour) }
@@ -239,14 +242,15 @@ class WeatherRepository(
         currentHumidity: Int,
         currentWind: Double,
         currentGusts: Double,
-        currentWeatherCode: Int,
-        dailyRainSum: Double,
-        dailyRainProb: Int
+        currentRain: Double,
+        hourlyForecast: List<HourlyForecastItem>
     ): List<WeatherAlert> {
         val alerts = mutableListOf<WeatherAlert>()
 
         // 1. Heavy Rain Alert
-        if (dailyRainSum >= 20.0 || (dailyRainProb >= 75 && WeatherCodeMapper.isRainy(currentWeatherCode))) {
+        // Check actual forecast precipitation amount and timing
+        val hasHeavyRainForecast = hourlyForecast.take(12).any { it.rainAmount >= 5.0 }
+        if (currentRain >= 5.0 || hasHeavyRainForecast) {
             alerts.add(
                 WeatherAlert(
                     type = AlertType.HEAVY_RAIN,
